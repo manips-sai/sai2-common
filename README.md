@@ -21,7 +21,7 @@ The Sai2-Common library implements a set of simplifying interfaces and helper mo
 * RBDL: Articulated rigid-body kinematics, forward dynamics and inverse dynamics. [https://bitbucket.org/rbdl/rbdl/src]  
 Note: Please specify the following CMake flags when building RBDL to build the URDF reader addon: 
 ``` cmake
--DRBDL_BUILD_ADDON_URDFREADER=ON -DRBDL_USE_ROS_URDF_LIBRARY=OFF ..
+cmake -DRBDL_BUILD_ADDON_URDFREADER=ON -DRBDL_USE_ROS_URDF_LIBRARY=OFF ..
 ```
 
 ### SAI library dependencies:
