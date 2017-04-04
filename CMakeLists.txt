@@ -7,7 +7,7 @@ SET(CMAKE_CXX_FLAGS "-std=c++11")
 
 # include Chai3d (required by Dynamics3D)
 # -- this is required by Chai3d to pick the correct path for OpenGL headers
-FIND_PACKAGE(Chai3d REQUIRED)
+FIND_PACKAGE(CHAI3D REQUIRED)
 ADD_DEFINITIONS(${CHAI3D_DEFINITIONS})
 if (CMAKE_SYSTEM_NAME MATCHES Darwin) 
   ADD_DEFINITIONS(-D_MACOSX -DMACOSX)
@@ -20,44 +20,44 @@ LINK_DIRECTORIES(${CHAI3D_LIBRARY_DIRS})
 FIND_PACKAGE(SAI2-SIMULATION REQUIRED)
 
 # include Parser
-SET(PARSER_SOURCE ${PROJECT_SOURCE_DIR}/src/Parser/URDFToDynamics3d.cpp
-	${PROJECT_SOURCE_DIR}/src/Parser/URDFToChaiGraphics.cpp)
+SET(PARSER_SOURCE ${PROJECT_SOURCE_DIR}/src/parser/URDFToDynamics3d.cpp
+	${PROJECT_SOURCE_DIR}/src/parser/URDFToChaiGraphics.cpp)
 
 SET (SAI2-COMMON_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/src)
 
 # include urdf, compiled with application
-SET(URDF_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/src/Parser/)
-SET(URDF_SOURCE ${PROJECT_SOURCE_DIR}/src/Parser/urdf/urdfdom/urdf_parser/src/pose.cpp
-		${PROJECT_SOURCE_DIR}/src/Parser/urdf/urdfdom/urdf_parser/src/link.cpp
-		${PROJECT_SOURCE_DIR}/src/Parser/urdf/urdfdom/urdf_parser/src/graphics.cpp
-		${PROJECT_SOURCE_DIR}/src/Parser/urdf/urdfdom/urdf_parser/src/world.cpp
-		${PROJECT_SOURCE_DIR}/src/Parser/urdf/urdfdom/urdf_parser/src/model.cpp
-		${PROJECT_SOURCE_DIR}/src/Parser/urdf/urdfdom/urdf_parser/src/joint.cpp
-		${PROJECT_SOURCE_DIR}/src/Parser/urdf/urdfdom/urdf_parser/include/urdf_parser/urdf_parser.h
-		${PROJECT_SOURCE_DIR}/src/Parser/urdf/urdfdom_headers/urdf_exception/include/urdf_exception/exception.h	
-		${PROJECT_SOURCE_DIR}/src/Parser/urdf/urdfdom_headers/urdf_model/include/urdf_model/pose.h
-		${PROJECT_SOURCE_DIR}/src/Parser/urdf/urdfdom_headers/urdf_world/include/urdf_world/world.h
-		${PROJECT_SOURCE_DIR}/src/Parser/urdf/urdfdom_headers/urdf_model/include/urdf_model/model.h
-		${PROJECT_SOURCE_DIR}/src/Parser/urdf/urdfdom_headers/urdf_model/include/urdf_model/link.h
-		${PROJECT_SOURCE_DIR}/src/Parser/urdf/urdfdom_headers/urdf_model/include/urdf_model/joint.h
-		${PROJECT_SOURCE_DIR}/src/Parser/urdf/boost_replacement/lexical_cast.h
-		${PROJECT_SOURCE_DIR}/src/Parser/urdf/boost_replacement/shared_ptr.h
-		${PROJECT_SOURCE_DIR}/src/Parser/urdf/boost_replacement/printf_console.cpp
-		${PROJECT_SOURCE_DIR}/src/Parser/urdf/boost_replacement/printf_console.h
-		${PROJECT_SOURCE_DIR}/src/Parser/urdf/boost_replacement/string_split.cpp
-		${PROJECT_SOURCE_DIR}/src/Parser/urdf/boost_replacement/string_split.h)
+SET(URDF_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/src/parser/)
+SET(URDF_SOURCE ${URDF_INCLUDE_DIR}/urdf/urdfdom/urdf_parser/src/pose.cpp
+		${URDF_INCLUDE_DIR}/urdf/urdfdom/urdf_parser/src/link.cpp
+		${URDF_INCLUDE_DIR}/urdf/urdfdom/urdf_parser/src/graphics.cpp
+		${URDF_INCLUDE_DIR}/urdf/urdfdom/urdf_parser/src/world.cpp
+		${URDF_INCLUDE_DIR}/urdf/urdfdom/urdf_parser/src/model.cpp
+		${URDF_INCLUDE_DIR}/urdf/urdfdom/urdf_parser/src/joint.cpp
+		${URDF_INCLUDE_DIR}/urdf/urdfdom/urdf_parser/include/urdf_parser/urdf_parser.h
+		${URDF_INCLUDE_DIR}/urdf/urdfdom_headers/urdf_exception/include/urdf_exception/exception.h
+		${URDF_INCLUDE_DIR}/urdf/urdfdom_headers/urdf_model/include/urdf_model/pose.h
+		${URDF_INCLUDE_DIR}/urdf/urdfdom_headers/urdf_world/include/urdf_world/world.h
+		${URDF_INCLUDE_DIR}/urdf/urdfdom_headers/urdf_model/include/urdf_model/model.h
+		${URDF_INCLUDE_DIR}/urdf/urdfdom_headers/urdf_model/include/urdf_model/link.h
+		${URDF_INCLUDE_DIR}/urdf/urdfdom_headers/urdf_model/include/urdf_model/joint.h
+		${URDF_INCLUDE_DIR}/urdf/boost_replacement/lexical_cast.h
+		${URDF_INCLUDE_DIR}/urdf/boost_replacement/shared_ptr.h
+		${URDF_INCLUDE_DIR}/urdf/boost_replacement/printf_console.cpp
+		${URDF_INCLUDE_DIR}/urdf/boost_replacement/printf_console.h
+		${URDF_INCLUDE_DIR}/urdf/boost_replacement/string_split.cpp
+		${URDF_INCLUDE_DIR}/urdf/boost_replacement/string_split.h)
 
 # include Simulation
-SET(SIMULATION_SOURCE ${PROJECT_SOURCE_DIR}/src/Simulation/SimulationInterface.cpp
-	${PROJECT_SOURCE_DIR}/src/Simulation/Sai2Simulation.cpp)
+SET(SIMULATION_SOURCE ${PROJECT_SOURCE_DIR}/src/simulation/SimulationInterface.cpp
+	${PROJECT_SOURCE_DIR}/src/simulation/Sai2Simulation.cpp)
 
 # include Graphics
-SET(GRAPHICS_SOURCE ${PROJECT_SOURCE_DIR}/src/Graphics/GraphicsInterface.cpp
-	${PROJECT_SOURCE_DIR}/src/Graphics/ChaiGraphics.cpp)
+SET(GRAPHICS_SOURCE ${PROJECT_SOURCE_DIR}/src/graphics/GraphicsInterface.cpp
+	${PROJECT_SOURCE_DIR}/src/graphics/ChaiGraphics.cpp)
 
 # include Model
-SET(MODEL_SOURCE ${PROJECT_SOURCE_DIR}/src/Model/ModelInterface.cpp
-	${PROJECT_SOURCE_DIR}/src/Model/RBDLModel.cpp)
+SET(MODEL_SOURCE ${PROJECT_SOURCE_DIR}/src/model/ModelInterface.cpp
+	${PROJECT_SOURCE_DIR}/src/model/RBDLModel.cpp)
 
 # Add the include directory to the include paths
 INCLUDE_DIRECTORIES (
