@@ -1,6 +1,6 @@
 
 # include GLFW3
-FIND_PACKAGE(glfw3 REQUIRED)
+FIND_PACKAGE(glfw3 QUIET)
 
 # add the include directory to the include paths
 INCLUDE_DIRECTORIES (
