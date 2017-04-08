@@ -3,7 +3,7 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.8.12)
 PROJECT (SAI2-COMMON)
 SET (PROJECT_VERSION 0.1.0) #major version is zero for now since api will certainly change in future
 
-SET(CMAKE_CXX_FLAGS "-std=c++11")
+SET(CMAKE_CXX_FLAGS "-std=c++11 -I/usr/include -I/usr/local/include")
 
 # include Chai3d (required by Dynamics3D)
 # -- this is required by Chai3d to pick the correct path for OpenGL headers
