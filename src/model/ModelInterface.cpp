@@ -129,25 +129,12 @@ void ModelInterface::orientationError(Eigen::Vector3d& delta_phi,
 	}
 }
 
-// TODO : Untested
 void ModelInterface::orientationError(Eigen::Vector3d& delta_phi,
 		              const Eigen::Quaterniond& desired_orientation,
 		              const Eigen::Quaterniond& current_orientation)
 {
-	Eigen::MatrixXd lambda_hat_t(3,4);
-	double lambda_0 = current_orientation.w();
-	double lambda_1 = current_orientation.x();
-	double lambda_2 = current_orientation.y();
-	double lambda_3 = current_orientation.z();
-
-	lambda_hat_t << -lambda_1, lambda_0, -lambda_3, lambda_2,
-			        -lambda_2, lambda_3, lambda_0, -lambda_1,
-			        -lambda_3, -lambda_2, lambda_1, lambda_0;
-
-	Eigen::VectorXd lambda_d(4);
-	lambda_d << desired_orientation.w(), desired_orientation.x(), desired_orientation.y(), desired_orientation.z();
-
-	delta_phi = -2*lambda_hat_t*lambda_d;
+	Eigen::Quaterniond inv_dlambda = desired_orientation*current_orientation.conjugate();
+	delta_phi = 2.0*inv_dlambda.vec();
 }
 
 // TODO : Untested
