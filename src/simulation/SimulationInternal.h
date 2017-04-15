@@ -117,6 +117,8 @@ public:
      * @param timestep Time step in seconds by which to forward simulation.
      */
 	virtual void integrate(double timestep) = 0;
+
+     virtual void showContactInfo() = 0;
 };
 
 }

@@ -130,6 +130,8 @@ public:
      */
 	void integrate(double timestep);
 
+     void showContactInfo();
+
 public:
 	/**
      * @brief Internal dynamics world object.

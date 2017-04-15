@@ -106,4 +106,8 @@ void SimulationInterface::integrate(double timestep) {
 	_simulation_internal->integrate(timestep);	
 }
 
+void SimulationInterface::showContactInfo() {
+	_simulation_internal->showContactInfo();
+}
+
 }

@@ -170,4 +170,38 @@ void Sai2Simulation::integrate(double timestep) {
 	_world->updateDynamics(timestep);
 }
 
+void Sai2Simulation::showContactInfo()
+{
+
+    // clear contact points for non contacting objects
+    list<cDynamicBase*>::iterator i;
+    for(i = _world->m_dynamicObjects.begin(); i != _world->m_dynamicObjects.end(); ++i)
+    {
+        cDynamicBase* object = *i;
+    	int num_contacts = object->m_dynamicContacts->getNumContacts();
+        if(num_contacts > 0)
+        {
+	    	std::cout << "object name : " << object->m_name << std::endl;
+	    	std::cout << "num contacts : " << num_contacts << std::endl;
+	    	for(int k=0; k < num_contacts; k++)
+	    	{
+	    		cDynamicContact* contact = object->m_dynamicContacts->getContact(k);
+		    	std::cout << "contact " << k << " at link : " << contact->m_dynamicLink->m_name << std::endl;
+		    	std::cout << "contact position : " << contact->m_globalPos << std::endl;
+		    	std::cout << "contact normal : " << contact->m_globalNormal << std::endl;
+		    	std::cout << "contact normal force : " << contact->m_globalNormalForce << std::endl;
+		    	std::cout << "contact friction force : " << contact->m_globalFrictionForce << std::endl;
+		    	std::cout << "contact force magnitude : " << contact->m_normalForceMagnitude << std::endl;
+	    	}
+	    	std::cout << std::endl;
+        }
+
+        // cDynContactList* contactList = nextItem->m_dynBaseNode->contact();
+        // if (contactList->n() == 0)
+        // {
+        //     nextItem->m_dynamicContacts->clear();
+        // }
+    }
+}
+
 }

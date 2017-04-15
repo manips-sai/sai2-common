@@ -142,6 +142,7 @@ public:
 	void integrate(double timestep);
 
 	// TODO: read contact information
+     void showContactInfo(); 
 public:
 	/**
      * @brief Internal simulation object. For advanced users only.
