@@ -173,12 +173,12 @@ void Sai2Simulation::integrate(double timestep) {
 void Sai2Simulation::showContactInfo()
 {
 
-    // clear contact points for non contacting objects
     list<cDynamicBase*>::iterator i;
     for(i = _world->m_dynamicObjects.begin(); i != _world->m_dynamicObjects.end(); ++i)
     {
         cDynamicBase* object = *i;
     	int num_contacts = object->m_dynamicContacts->getNumContacts();
+    	// consider only contacting objects
         if(num_contacts > 0)
         {
 	    	std::cout << "object name : " << object->m_name << std::endl;
@@ -196,12 +196,6 @@ void Sai2Simulation::showContactInfo()
 	    	}
 	    	std::cout << std::endl;
         }
-
-        // cDynContactList* contactList = nextItem->m_dynBaseNode->contact();
-        // if (contactList->n() == 0)
-        // {
-        //     nextItem->m_dynamicContacts->clear();
-        // }
     }
 }
 
@@ -217,27 +211,32 @@ void Sai2Simulation::getContactList(std::vector<Eigen::Vector3d>& contact_points
     for(i = _world->m_dynamicObjects.begin(); i != _world->m_dynamicObjects.end(); ++i)
     {
     	cDynamicBase* object = *i;
+    	// only consider the desired object
     	if(object->m_name != robot_name)
     	{
     		continue;
     	}
     	int num_contacts = object->m_dynamicContacts->getNumContacts();
+    	// only consider if the oject is contacting something
         if(num_contacts > 0)
         {
         	for(int k=0; k < num_contacts; k++)
 	    	{
 	        	cDynamicContact* contact = object->m_dynamicContacts->getContact(k);
+	        	// only consider contacts at the desired link
 	        	if(contact->m_dynamicLink->m_name != link_name)
 	        	{
 	        		continue;
 	        	}
+	        	// copy chai3d vector to eigen vector
 	        	for(int l=0; l<3; l++)
 	        	{
 		        	current_position(l) = contact->m_globalPos(l);
 		        	current_force(l) = contact->m_globalNormalForce(l) + contact->m_globalFrictionForce(l);
 	        	}
+	        	// reverse the sign to get the list of forces applied to the considered object
 	        	contact_points.push_back(current_position);
-	        	contact_forces.push_back(current_force);
+	        	contact_forces.push_back(-current_force);
 	        }
         }
 

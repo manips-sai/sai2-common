@@ -118,8 +118,19 @@ public:
      */
 	virtual void integrate(double timestep) = 0;
 
+     /**
+      * @brief      Shows the contact information, whenever a contact occurs
+      */
      virtual void showContactInfo() = 0;
 
+     /**
+      * @brief      Gets a vector of contact points and the corresponding contact forces at a gicen link of a given object. Gives everything in base frame.
+      *
+      * @param      contact_points  The contact points vector to be returned
+      * @param      contact_forces  The contact forces vector to be returned
+      * @param[in]  robot_name      The robot name
+      * @param[in]  link_name       The link name
+      */
      virtual void getContactList(std::vector<Eigen::Vector3d>& contact_points, std::vector<Eigen::Vector3d>& contact_forces, 
      const::std::string& robot_name, const std::string& link_name) = 0;
 };
