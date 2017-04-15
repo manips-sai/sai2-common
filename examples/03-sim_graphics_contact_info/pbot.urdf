@@ -8,7 +8,7 @@
             <mass value="1" />
             <inertia ixx="0.1" iyy="0.1" izz="0.1" ixy="0" ixz="0" iyz="0" />
         </inertial>
-        <collision>
+<!--         <collision>
             <origin xyz="0.0 0.0 -1.0" rpy="0 0 0" />
             <geometry>
                 <cylinder radius="0.25" length="1.0"/>
@@ -19,7 +19,7 @@
             <geometry>
                 <cylinder radius="0.25" length="1.0"/>
             </geometry>
-        </visual>
+        </visual> -->
     </link>
     <link name="link0">
         <inertial>
@@ -30,13 +30,15 @@
         <collision>
             <origin xyz="0.0 0.0 0.0" rpy="0 0 0" />
             <geometry>
-                <sphere radius="0.1" />
+                <!-- <sphere radius="0.1" /> -->
+                <box size="0.2 0.2 0.2" />
             </geometry>
         </collision>
         <visual>
             <origin xyz="0.0 0.0 0.0" rpy="0 0 0" />
             <geometry>
-                <sphere radius="0.1" />
+                <!-- <sphere radius="0.1" /> -->
+                <box size="0.2 0.2 0.2" />
             </geometry>
         </visual>
     </link>
@@ -44,7 +46,7 @@
     <joint name="j0" type="prismatic">
         <parent link="base_link" />
         <child link="link0" />
-        <origin xyz="0.000000 0.000000 2.000000" rpy="-0.000000 0.000000 -0.000000" />
+        <origin xyz="0.000000 0.000000 1.000000" rpy="-0.000000 0.000000 -0.000000" />
         <axis xyz="0 0 1" />
         <limit lower="-2.967" upper="2.967" effort="176" velocity="1.7104" />
     </joint>

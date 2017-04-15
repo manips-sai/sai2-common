@@ -132,6 +132,9 @@ public:
 
      void showContactInfo();
 
+     void getContactList(std::vector<Eigen::Vector3d>& contact_points, std::vector<Eigen::Vector3d>& contact_forces, 
+     const::std::string& robot_name, const std::string& link_name);
+
 public:
 	/**
      * @brief Internal dynamics world object.

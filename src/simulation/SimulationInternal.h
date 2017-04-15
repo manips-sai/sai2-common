@@ -119,6 +119,9 @@ public:
 	virtual void integrate(double timestep) = 0;
 
      virtual void showContactInfo() = 0;
+
+     virtual void getContactList(std::vector<Eigen::Vector3d>& contact_points, std::vector<Eigen::Vector3d>& contact_forces, 
+     const::std::string& robot_name, const std::string& link_name) = 0;
 };
 
 }

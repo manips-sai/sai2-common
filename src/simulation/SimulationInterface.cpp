@@ -110,4 +110,9 @@ void SimulationInterface::showContactInfo() {
 	_simulation_internal->showContactInfo();
 }
 
+void SimulationInterface::getContactList(std::vector<Eigen::Vector3d>& contact_points, std::vector<Eigen::Vector3d>& contact_forces, 
+     const::std::string& robot_name, const std::string& link_name) {
+	_simulation_internal->getContactList(contact_points, contact_forces, robot_name, link_name);
+}
+
 }

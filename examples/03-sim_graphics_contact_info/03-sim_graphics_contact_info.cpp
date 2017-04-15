@@ -74,6 +74,9 @@ int main() {
     // set callbacks
 	glfwSetKeyCallback(window, keySelect);
 
+	std::vector<Eigen::Vector3d> contact_points;
+	std::vector<Eigen::Vector3d> contact_forces;
+
     // while window is open:
     while (!glfwWindowShouldClose(window))
 	{
@@ -107,14 +110,23 @@ int main() {
 		assert(err == GL_NO_ERROR);
 
 	    // poll for events
-	    glfwPollEvents();
+		glfwPollEvents();
 
-	    // if(simulation_counter % 500 == 0)
-	    {
-	    	sim->showContactInfo();
-	    }
+    	// sim->showContactInfo();
+		sim->getContactList(contact_points, contact_forces, robot_name1, "link0");
+		if(!contact_points.empty())
+		{
+			std::cout << "contact at " << robot_name1 << " link0" << std::endl;
+			int n = contact_points.size();
+			for (int i=0; i < n; i++)
+			{
+				std::cout << "contact point " << i << " : " << contact_points[i].transpose() << "\n";
+				std::cout << "contact force " << i << " : " << contact_forces[i].transpose() << "\n";
+			}
+			std::cout << endl;
+		}
 
-	    simulation_counter++;
+		simulation_counter++;
 	}
 
     // destroy context

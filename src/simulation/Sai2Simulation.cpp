@@ -192,6 +192,7 @@ void Sai2Simulation::showContactInfo()
 		    	std::cout << "contact normal force : " << contact->m_globalNormalForce << std::endl;
 		    	std::cout << "contact friction force : " << contact->m_globalFrictionForce << std::endl;
 		    	std::cout << "contact force magnitude : " << contact->m_normalForceMagnitude << std::endl;
+		    	std::cout << "time : " << contact->m_time << std::endl;
 	    	}
 	    	std::cout << std::endl;
         }
@@ -201,6 +202,46 @@ void Sai2Simulation::showContactInfo()
         // {
         //     nextItem->m_dynamicContacts->clear();
         // }
+    }
+}
+
+void Sai2Simulation::getContactList(std::vector<Eigen::Vector3d>& contact_points, std::vector<Eigen::Vector3d>& contact_forces, 
+	const::std::string& robot_name, const std::string& link_name) 
+{
+	contact_points.clear();
+	contact_forces.clear();
+	Eigen::Vector3d current_position = Eigen::Vector3d::Zero();
+	Eigen::Vector3d current_force = Eigen::Vector3d::Zero();
+
+	list<cDynamicBase*>::iterator i;
+    for(i = _world->m_dynamicObjects.begin(); i != _world->m_dynamicObjects.end(); ++i)
+    {
+    	cDynamicBase* object = *i;
+    	if(object->m_name != robot_name)
+    	{
+    		continue;
+    	}
+    	int num_contacts = object->m_dynamicContacts->getNumContacts();
+        if(num_contacts > 0)
+        {
+        	for(int k=0; k < num_contacts; k++)
+	    	{
+	        	cDynamicContact* contact = object->m_dynamicContacts->getContact(k);
+	        	if(contact->m_dynamicLink->m_name != link_name)
+	        	{
+	        		continue;
+	        	}
+	        	for(int l=0; l<3; l++)
+	        	{
+		        	current_position(l) = contact->m_globalPos(l);
+		        	current_force(l) = contact->m_globalNormalForce(l) + contact->m_globalFrictionForce(l);
+	        	}
+	        	contact_points.push_back(current_position);
+	        	contact_forces.push_back(current_force);
+	        }
+        }
+
+
     }
 }
 
