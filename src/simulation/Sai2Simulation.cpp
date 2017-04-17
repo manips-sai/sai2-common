@@ -224,7 +224,7 @@ void Sai2Simulation::getContactList(std::vector<Eigen::Vector3d>& contact_points
 	    	{
 	        	cDynamicContact* contact = object->m_dynamicContacts->getContact(k);
 	        	// only consider contacts at the desired link
-	        	if(contact->m_dynamicLink->m_name != link_name)
+                if(contact==NULL || contact->m_dynamicLink->m_name != link_name)
 	        	{
 	        		continue;
 	        	}
