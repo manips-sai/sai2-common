@@ -130,7 +130,6 @@ public:
      */
 	void integrate(double timestep);
 
-
      /**
       * @brief      Shows the contact information, whenever a contact occurs
       */
@@ -146,6 +145,84 @@ public:
       */
      void getContactList(std::vector<Eigen::Vector3d>& contact_points, std::vector<Eigen::Vector3d>& contact_forces, 
      const::std::string& robot_name, const std::string& link_name);
+
+     /* Sai2-Simulation specific interface */
+
+     /**
+      * @brief      Set the co-efficient of kinematic restitution: for all objects
+      * @param      restitution  Value to set
+      */
+     void setCollisionRestitution(double restitution);
+
+     /**
+      * @brief      Set the co-efficient of kinematic restitution: for a named link on a named robot
+      * @param      robot_name  Robot on which to set the value
+      * @param      link_name  Robot on which to set the value
+      * @param      restitution  Value to set
+      */
+     void setCollisionRestitution(const std::string& robot_name,
+                                        const std::string& link_name,
+                                        double restitution);
+
+     /**
+      * @brief      Get the co-efficient of kinematic restitution: for a named link on a named robot
+      * @param      robot_name  Robot from which to get the value
+      * @param      link_name  Robot from which to get the value
+      * @return     Current value
+      */
+     double getCollisionRestitution(const std::string& robot_name,
+                                        const std::string& link_name) const;
+
+     /**
+      * @brief      Set the co-efficient of static friction: for all objects
+      * @param      restitution  Value to set
+      */
+     void setCoeffFrictionStatic(double static_friction); // for all objects
+
+     /**
+      * @brief      Set the co-efficient of kinematic restitution: for a named link on a named robot
+      * @param      robot_name  Robot on which to set the value
+      * @param      link_name  Robot on which to set the value
+      * @param      restitution  Value to set
+      */
+     void setCoeffFrictionStatic(const std::string& robot_name,
+                                   const std::string& link_name,
+                                   double static_friction);
+
+     /**
+      * @brief      Get the co-efficient of static friction: for a named link on a named robot
+      * @param      robot_name  Robot from which to get the value
+      * @param      link_name  Robot from which to get the value
+      * @return     Current value
+      */
+     double getCoeffFrictionStatic(const std::string& robot_name,
+                                   const std::string& link_name) const;
+
+     /**
+      * @brief      Set the co-efficient of dynamic friction: for all objects
+      * @param      restitution  Value to set
+      */
+     void setCoeffFrictionDynamic(double dynamic_friction); // for all objects
+
+     /**
+      * @brief      Set the co-efficient of kinematic restitution: for a named link on a named robot
+      *
+      * @param      robot_name  Robot on which to set the value
+      * @param      link_name  Robot on which to set the value
+      * @param      restitution  Value to set
+      */
+     void setCoeffFrictionDynamic(const std::string& robot_name,
+                                   const std::string& link_name,
+                                   double dynamic_friction);
+
+     /**
+      * @brief      Get the co-efficient of dynamic friction: for a named link on a named robot
+      * @param      robot_name  Robot from which to get the value
+      * @param      link_name  Robot from which to get the value
+      * @return     Current value
+      */
+     double getCoeffFrictionDynamic(const std::string& robot_name,
+                                        const std::string& link_name) const;
 
 public:
 	/**

@@ -10,6 +10,7 @@
 
 #include "parser/URDFToDynamics3d.h"
 #include <math/CMatrix3d.h> // chai math library
+#include <stdexcept>
 
 using namespace std;
 using namespace chai3d;
@@ -242,6 +243,111 @@ void Sai2Simulation::getContactList(std::vector<Eigen::Vector3d>& contact_points
 
 
     }
+}
+
+// set restitution co-efficients: for all objects
+void Sai2Simulation::setCollisionRestitution(double restitution) {
+	// for all dynamic base
+	for (cDynamicBase* base: _world->m_dynamicObjects) {
+		// for all links in this base
+		for (cDynamicLink* link: base->m_dynamicLinks) {
+			cDynamicMaterial* mat = link->getDynamicMaterial();
+			mat->setEpsilon(restitution);
+		}
+	}
+}
+
+// set restitution co-efficients: for a named link
+void Sai2Simulation::setCollisionRestitution(const std::string& robot_name,
+		                                        const std::string& link_name,
+		                                        double restitution) {
+	auto robot = _world->getBaseNode(robot_name);
+	assert(robot);
+	auto link = robot->getLink(link_name);
+	assert(link);
+	cDynamicMaterial* mat = link->getDynamicMaterial();
+	mat->setEpsilon(restitution);
+}
+
+// get co-efficient of restitution: for a named object
+double Sai2Simulation::getCollisionRestitution(const std::string& robot_name,
+		                                        const std::string& link_name) const {
+	auto robot = _world->getBaseNode(robot_name);
+	assert(robot);
+	auto link = robot->getLink(link_name);
+	assert(link);
+	cDynamicMaterial* mat = link->getDynamicMaterial();
+	return mat->getEpsilon();
+}
+
+// set co-efficient of static friction: for all objects
+void Sai2Simulation::setCoeffFrictionStatic(double static_friction) {
+	// for all dynamic base
+	for (cDynamicBase* base: _world->m_dynamicObjects) {
+		// for all links in this base
+		for (cDynamicLink* link: base->m_dynamicLinks) {
+			cDynamicMaterial* mat = link->getDynamicMaterial();
+			mat->setStaticFriction(static_friction);
+		}
+	}
+}
+
+// set co-efficient of static friction: for a named object
+void Sai2Simulation::setCoeffFrictionStatic(const std::string& robot_name,
+                                   			const std::string& link_name,
+                                   			double static_friction) {
+	auto robot = _world->getBaseNode(robot_name);
+	assert(robot);
+	auto link = robot->getLink(link_name);
+	assert(link);
+	cDynamicMaterial* mat = link->getDynamicMaterial();
+	mat->setStaticFriction(static_friction);
+}
+
+// get co-efficient of static friction: for a named object
+double Sai2Simulation::getCoeffFrictionStatic(const std::string& robot_name,
+												const std::string& link_name) const {
+	auto robot = _world->getBaseNode(robot_name);
+	assert(robot);
+	auto link = robot->getLink(link_name);
+	assert(link);
+	cDynamicMaterial* mat = link->getDynamicMaterial();
+	return mat->getStaticFriction();
+}
+
+// set co-efficient of dynamic friction: for all object
+void Sai2Simulation::setCoeffFrictionDynamic(double dynamic_friction) {
+	// for all dynamic base
+	for (cDynamicBase* base: _world->m_dynamicObjects) {
+		// for all links in this base
+		for (cDynamicLink* link: base->m_dynamicLinks) {
+			cDynamicMaterial* mat = link->getDynamicMaterial();
+			mat->setDynamicFriction(dynamic_friction);
+		}
+	}
+}
+
+// set co-efficient of dynamic friction: for a named object
+void Sai2Simulation::setCoeffFrictionDynamic(const std::string& robot_name,
+												const std::string& link_name,
+												double dynamic_friction) {
+	auto robot = _world->getBaseNode(robot_name);
+	assert(robot);
+	auto link = robot->getLink(link_name);
+	assert(link);
+	cDynamicMaterial* mat = link->getDynamicMaterial();
+	mat->setDynamicFriction(dynamic_friction);
+}
+
+// get co-efficient of dynamic friction: for a named object
+double Sai2Simulation::getCoeffFrictionDynamic(const std::string& robot_name,
+		                                        const std::string& link_name) const {
+	auto robot = _world->getBaseNode(robot_name);
+	assert(robot);
+	auto link = robot->getLink(link_name);
+	assert(link);
+	cDynamicMaterial* mat = link->getDynamicMaterial();
+	return mat->getDynamicFriction();
 }
 
 }
