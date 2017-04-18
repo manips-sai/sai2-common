@@ -190,7 +190,7 @@ public :
     void taskInertiaMatrix(Eigen::MatrixXd& Lambda,
     					   const Eigen::MatrixXd& task_jacobian);
 
-    void dynConsistantInverseJacobian(Eigen::MatrixXd& Jbar,
+    void dynConsistentInverseJacobian(Eigen::MatrixXd& Jbar,
     								  const Eigen::MatrixXd& task_jacobian);
 
 

@@ -179,13 +179,13 @@ void ModelInterface::taskInertiaMatrix(Eigen::MatrixXd& Lambda,
 }
 
 //TODO : Untested
-void ModelInterface::dynConsistantInverseJacobian(Eigen::MatrixXd& Jbar,
+void ModelInterface::dynConsistentInverseJacobian(Eigen::MatrixXd& Jbar,
 									const Eigen::MatrixXd& task_jacobian)
 {
 	// check matrices have the right size
 	if(Jbar.rows() != task_jacobian.cols() || Jbar.cols() != task_jacobian.rows())
 	{
-		throw std::invalid_argument("Matrix dimmensions inconsistent in ModelInterface::dynConsistantInverseJacobian");
+		throw std::invalid_argument("Matrix dimmensions inconsistent in ModelInterface::dynConsistentInverseJacobian");
 		return;
 	}
 	// compute Jbar
@@ -228,7 +228,7 @@ void ModelInterface::nullspaceMatrix(Eigen::MatrixXd& N,
 	else
 	{
 		Eigen::MatrixXd Jbar = Eigen::MatrixXd::Zero(jacobian.cols(),jacobian.rows());
-		dynConsistantInverseJacobian(Jbar,jacobian);
+		dynConsistentInverseJacobian(Jbar,jacobian);
 		Eigen::MatrixXd Ni = Eigen::MatrixXd::Identity(N.rows(),N.cols());
 		Ni = Ni - Jbar*jacobian;
 		N = Ni*N_prec;
