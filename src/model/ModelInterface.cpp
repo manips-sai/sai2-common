@@ -129,25 +129,12 @@ void ModelInterface::orientationError(Eigen::Vector3d& delta_phi,
 	}
 }
 
-// TODO : Untested
 void ModelInterface::orientationError(Eigen::Vector3d& delta_phi,
 		              const Eigen::Quaterniond& desired_orientation,
 		              const Eigen::Quaterniond& current_orientation)
 {
-	Eigen::MatrixXd lambda_hat_t(3,4);
-	double lambda_0 = current_orientation.w();
-	double lambda_1 = current_orientation.x();
-	double lambda_2 = current_orientation.y();
-	double lambda_3 = current_orientation.z();
-
-	lambda_hat_t << -lambda_1, lambda_0, -lambda_3, lambda_2,
-			        -lambda_2, lambda_3, lambda_0, -lambda_1,
-			        -lambda_3, -lambda_2, lambda_1, lambda_0;
-
-	Eigen::VectorXd lambda_d(4);
-	lambda_d << desired_orientation.w(), desired_orientation.x(), desired_orientation.y(), desired_orientation.z();
-
-	delta_phi = -2*lambda_hat_t*lambda_d;
+	Eigen::Quaterniond inv_dlambda = desired_orientation*current_orientation.conjugate();
+	delta_phi = 2.0*inv_dlambda.vec();
 }
 
 // TODO : Untested
@@ -198,15 +185,15 @@ void ModelInterface::dynConsistentInverseJacobian(Eigen::MatrixXd& Jbar,
 }
 
 void ModelInterface::nullspaceMatrix(Eigen::MatrixXd& N,
-        					 const Eigen::MatrixXd& jacobian)
+        					 const Eigen::MatrixXd& task_jacobian)
 {
 	Eigen::MatrixXd N_prec = Eigen::MatrixXd::Identity(dof(),dof());
-	nullspaceMatrix(N,jacobian,N_prec);
+	nullspaceMatrix(N,task_jacobian,N_prec);
 }
 
 //TODO :: Untested
 void ModelInterface::nullspaceMatrix(Eigen::MatrixXd& N,
-    					 const Eigen::MatrixXd& jacobian,
+    					 const Eigen::MatrixXd& task_jacobian,
     					 const Eigen::MatrixXd& N_prec)
 {
 	// check matrices dimmnsions
@@ -220,17 +207,79 @@ void ModelInterface::nullspaceMatrix(Eigen::MatrixXd& N,
 		throw std::invalid_argument("N_prec matrix dimensions inconsistent in ModelInterface::nullspaceMatrix");
 		return;
 	}
-	else if(jacobian.cols() != N.rows())
+	else if(task_jacobian.cols() != N.rows())
 	{
 		throw std::invalid_argument("jacobian matrix dimensions inconsistent with model dof in ModelInterface::nullspaceMatrix");
 		return;
 	}
+	// Compute N
 	else
 	{
-		Eigen::MatrixXd Jbar = Eigen::MatrixXd::Zero(jacobian.cols(),jacobian.rows());
-		dynConsistentInverseJacobian(Jbar,jacobian);
+		Eigen::MatrixXd Jbar = Eigen::MatrixXd::Zero(task_jacobian.cols(),task_jacobian.rows());
+		dynConsistentInverseJacobian(Jbar,task_jacobian);
 		Eigen::MatrixXd Ni = Eigen::MatrixXd::Identity(N.rows(),N.cols());
-		Ni = Ni - Jbar*jacobian;
+		Ni = Ni - Jbar*task_jacobian;
+		N = Ni*N_prec;
+	}
+}
+
+// TODO : Untested
+void ModelInterface::operationalSpaceMatrices(Eigen::MatrixXd& Lambda, Eigen::MatrixXd& Jbar, Eigen::MatrixXd& N,
+                                    const Eigen::MatrixXd& task_jacobian)
+{
+	Eigen::MatrixXd N_prec = Eigen::MatrixXd::Identity(dof(),dof());
+	operationalSpaceMatrices(Lambda,Jbar,N,task_jacobian,N_prec);
+}
+
+// TODO : Untested
+void ModelInterface::operationalSpaceMatrices(Eigen::MatrixXd& Lambda, Eigen::MatrixXd& Jbar, Eigen::MatrixXd& N,
+                                    const Eigen::MatrixXd& task_jacobian,
+                                    const Eigen::MatrixXd& N_prec)
+{
+	// check matrices have the right size
+	if(Lambda.rows() != Lambda.cols())
+	{
+		throw std::invalid_argument("Lambda matrix not square in ModelInterface::operationalSpaceMatrices");
+		return;
+	}
+	else if (Lambda.rows() != task_jacobian.rows())
+	{
+		throw std::invalid_argument("Rows of Jacobian inconsistent with size of Lambda matrix in ModelInterface::operationalSpaceMatrices");
+		return;
+	}
+	else if(task_jacobian.cols() != _model_internal->_dof)
+	{
+		throw std::invalid_argument("Jacobian size inconsistent with DOF of robot model in ModelInterface::operationalSpaceMatrices");
+		return;
+	}
+	else if(Jbar.rows() != task_jacobian.cols() || Jbar.cols() != task_jacobian.rows())
+	{
+		throw std::invalid_argument("Matrix dimmensions inconsistent in ModelInterface::operationalSpaceMatrices");
+		return;
+	}
+	else if(N.rows() != N.cols() || N.rows() != _model_internal->_dof)
+	{
+		throw std::invalid_argument("N matrix dimensions inconsistent in ModelInterface::operationalSpaceMatrices");
+		return;
+	}
+	else if(N_prec.rows() != N_prec.cols() || N_prec.rows() != _model_internal->_dof)
+	{
+		throw std::invalid_argument("N_prec matrix dimensions inconsistent in ModelInterface::operationalSpaceMatrices");
+		return;
+	}
+	else if(task_jacobian.cols() != N.rows())
+	{
+		throw std::invalid_argument("jacobian matrix dimensions inconsistent with model dof in ModelInterface::operationalSpaceMatrices");
+		return;
+	}
+	// Compute the matrices
+	else
+	{
+		Eigen::MatrixXd inv_inertia = task_jacobian*_M_inv*task_jacobian.transpose();
+		Lambda = inv_inertia.inverse();
+		Jbar = _M_inv*task_jacobian.transpose()*Lambda;
+		Eigen::MatrixXd Ni = Eigen::MatrixXd::Identity(N.rows(),N.cols());
+		Ni = Ni - Jbar*task_jacobian;
 		N = Ni*N_prec;
 	}
 }

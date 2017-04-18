@@ -187,20 +187,72 @@ public :
     		              const Eigen::Quaterniond& desired_orientation,
     		              const Eigen::Quaterniond& current_orientation);
 
+    /**
+     * @brief Computes the operational space matrix corresponding to a given Jacobian
+     * @param Lambda Matrix on which the operational space mass matrix will be written
+     * @param task_jacobian The jacobian of the task for which we want the op space mass matrix
+     */
     void taskInertiaMatrix(Eigen::MatrixXd& Lambda,
     					   const Eigen::MatrixXd& task_jacobian);
 
+    /**
+     * @brief      Computes the dynamically consistent inverse of the jacobian for a given task. Recomputes the task inertia at each call
+     *
+     * @param      Jbar           Matrix to which the dynamically consistent inverse will be written
+     * @param[in]  task_jacobian  The task jacobian
+     */
     void dynConsistentInverseJacobian(Eigen::MatrixXd& Jbar,
     								  const Eigen::MatrixXd& task_jacobian);
 
 
+    /**
+     * @brief      Computes the nullspace matrix for the highest priority task. Recomputes the dynamically consistent inverse and the task mass matrix at each call
+     *
+     * @param      N              Matrix to which the nullspace matrix will be written
+     * @param[in]  task_jacobian  The task jacobian
+     */
     void nullspaceMatrix(Eigen::MatrixXd& N,
-        					 const Eigen::MatrixXd& jacobian);
+        					 const Eigen::MatrixXd& task_jacobian);
 
+    /**
+     * @brief      Computes the nullspace matrix of the task, consistent with the previous nullspace
+     *             Recomputes the dynamically consistent inverse and the task mass matrix at each call   
+     *  
+     * @param      N              Matrix to which the nullspace matrix will be written
+     * @param[in]  task_jacobian  The task jacobian
+     * @param[in]  N_prec         The previous nullspace matrix
+     */
     void nullspaceMatrix(Eigen::MatrixXd& N,
-        					 const Eigen::MatrixXd& jacobian,
+        					 const Eigen::MatrixXd& task_jacobian,
         					 const Eigen::MatrixXd& N_prec);
 
+    /**
+     * @brief      Computes the operational spce matrices (task inertia, dynamically consistent inverse of the jacobian and nullspace) for a given task,
+     *             for the first task. More efficient than calling the three individual functions.
+     *
+     * @param      Lambda         Matrix to which the operational space mass matrix will be written
+     * @param      Jbar           Matrix to which the dynamically consistent inverse of the jacobian will be written
+     * @param      N              Matrix to which the nullspace matrix will be written
+     * @param[in]  task_jacobian  Task jacobian
+     */
+    void operationalSpaceMatrices(Eigen::MatrixXd& Lambda, Eigen::MatrixXd& Jbar, Eigen::MatrixXd& N,
+                                    const Eigen::MatrixXd& task_jacobian);
+
+    /**
+     * @brief      Computes the operational spce matrices (task inertia, dynamically consistent inverse of the jacobian and nullspace) for a given task,
+     *             In the nullspace of the previous task. More efficient than calling the three individual functions.
+     *
+     * @param      Lambda         Matrix to which the operational space mass matrix will be written
+     * @param      Jbar           Matrix to which the dynamically consistent inverse of the jacobian will be written
+     * @param      N              Matrix to which the nullspace matrix will be written
+     * @param[in]  task_jacobian  Task jacobian
+     * @param[in]  N_prec         Previous nullspace matrix
+     */
+    void operationalSpaceMatrices(Eigen::MatrixXd& Lambda, Eigen::MatrixXd& Jbar, Eigen::MatrixXd& N,
+                                    const Eigen::MatrixXd& task_jacobian,
+                                    const Eigen::MatrixXd& N_prec);
+
+    /// \brief pointer to the internal specific model
     ModelInternal* _model_internal;
 
     ////// Robot State ///////
