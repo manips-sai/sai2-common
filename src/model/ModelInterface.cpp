@@ -161,7 +161,14 @@ void ModelInterface::taskInertiaMatrix(Eigen::MatrixXd& Lambda,
 	else
 	{
 		Eigen::MatrixXd inv_inertia = task_jacobian*_M_inv*task_jacobian.transpose();
-		Lambda = inv_inertia.inverse();
+		// Lambda = inv_inertia.inverse();
+
+		// compute SVD pseudoinverse
+		// TODO: make class function?
+		Eigen::JacobiSVD<Eigen::MatrixXd> svd(inv_inertia, Eigen::ComputeThinU | Eigen::ComputeThinV);
+		static const double epsilon = std::numeric_limits<double>::epsilon();
+		double tolerance = epsilon * std::max(inv_inertia.cols(), inv_inertia.rows()) * svd.singularValues().array().abs()(0);
+		Lambda = svd.matrixV() * (svd.singularValues().array().abs() > tolerance).select(svd.singularValues().array().inverse(), 0).matrix().asDiagonal() * svd.matrixU().adjoint();
 	}
 }
 
