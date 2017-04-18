@@ -170,4 +170,78 @@ void Sai2Simulation::integrate(double timestep) {
 	_world->updateDynamics(timestep);
 }
 
+void Sai2Simulation::showContactInfo()
+{
+
+    list<cDynamicBase*>::iterator i;
+    for(i = _world->m_dynamicObjects.begin(); i != _world->m_dynamicObjects.end(); ++i)
+    {
+        cDynamicBase* object = *i;
+    	int num_contacts = object->m_dynamicContacts->getNumContacts();
+    	// consider only contacting objects
+        if(num_contacts > 0)
+        {
+	    	std::cout << "object name : " << object->m_name << std::endl;
+	    	std::cout << "num contacts : " << num_contacts << std::endl;
+	    	for(int k=0; k < num_contacts; k++)
+	    	{
+	    		cDynamicContact* contact = object->m_dynamicContacts->getContact(k);
+		    	std::cout << "contact " << k << " at link : " << contact->m_dynamicLink->m_name << std::endl;
+		    	std::cout << "contact position : " << contact->m_globalPos << std::endl;
+		    	std::cout << "contact normal : " << contact->m_globalNormal << std::endl;
+		    	std::cout << "contact normal force : " << contact->m_globalNormalForce << std::endl;
+		    	std::cout << "contact friction force : " << contact->m_globalFrictionForce << std::endl;
+		    	std::cout << "contact force magnitude : " << contact->m_normalForceMagnitude << std::endl;
+		    	std::cout << "time : " << contact->m_time << std::endl;
+	    	}
+	    	std::cout << std::endl;
+        }
+    }
+}
+
+void Sai2Simulation::getContactList(std::vector<Eigen::Vector3d>& contact_points, std::vector<Eigen::Vector3d>& contact_forces, 
+	const::std::string& robot_name, const std::string& link_name) 
+{
+	contact_points.clear();
+	contact_forces.clear();
+	Eigen::Vector3d current_position = Eigen::Vector3d::Zero();
+	Eigen::Vector3d current_force = Eigen::Vector3d::Zero();
+
+	list<cDynamicBase*>::iterator i;
+    for(i = _world->m_dynamicObjects.begin(); i != _world->m_dynamicObjects.end(); ++i)
+    {
+    	cDynamicBase* object = *i;
+    	// only consider the desired object
+    	if(object->m_name != robot_name)
+    	{
+    		continue;
+    	}
+    	int num_contacts = object->m_dynamicContacts->getNumContacts();
+    	// only consider if the oject is contacting something
+        if(num_contacts > 0)
+        {
+        	for(int k=0; k < num_contacts; k++)
+	    	{
+	        	cDynamicContact* contact = object->m_dynamicContacts->getContact(k);
+	        	// only consider contacts at the desired link
+                if(contact==NULL || contact->m_dynamicLink->m_name != link_name)
+	        	{
+	        		continue;
+	        	}
+	        	// copy chai3d vector to eigen vector
+	        	for(int l=0; l<3; l++)
+	        	{
+		        	current_position(l) = contact->m_globalPos(l);
+		        	current_force(l) = contact->m_globalNormalForce(l) + contact->m_globalFrictionForce(l);
+	        	}
+	        	// reverse the sign to get the list of forces applied to the considered object
+	        	contact_points.push_back(current_position);
+	        	contact_forces.push_back(-current_force);
+	        }
+        }
+
+
+    }
+}
+
 }
