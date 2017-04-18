@@ -35,12 +35,12 @@
 
 	<light name="light1" type="directional">
 		<position xyz="2.0 -2.0 2.0" />
-		<lookat xyz="0.0 0.0 0.0" />
+		<lookat xyz="0.0 0.0 0.5" />
 	</light>
 
 	<light name="light2" type="directional">
 		<position xyz="2.0 2.0 2.0" />
-		<lookat xyz="0.0 0.0 0.0" />
+		<lookat xyz="0.0 0.0 0.5" />
 	</light>
 
 	<camera name="camera_fixed">
