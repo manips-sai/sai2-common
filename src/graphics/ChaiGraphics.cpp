@@ -104,6 +104,8 @@ void ChaiGraphics::updateGraphics(const std::string& robot_name,
 			updateGraphicsLink(link, robot_model);
 		}
 	}
+	// update shadow maps. TODO: consider moving out from here if it is too expensive
+	_world->updateShadowMaps();
 }
 
 void ChaiGraphics::render(const std::string& camera_name,

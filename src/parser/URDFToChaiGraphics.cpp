@@ -217,12 +217,19 @@ void URDFToChaiGraphicsWorld(const std::string& filename,
 	for (const auto light_pair: urdf_world->graphics_.lights) {
 		const auto light_ptr = light_pair.second;
 		// initialize a chai light
-		if (light_ptr->type == "directional") {
-			cDirectionalLight *light;
-
-			// create a directional light source
-			light = new cDirectionalLight(world);
-			// TODO: support link mounted light
+		if (light_ptr->type == "directional" || light_ptr->type == "spot") {
+			cDirectionalLight* light;
+			if (light_ptr->type == "directional") {
+				// create a directional light source
+				light = new cDirectionalLight(world);
+				// TODO: support link mounted light
+			} else if (light_ptr->type == "spot") {
+				cSpotLight* spot_light = new cSpotLight(world);;
+				// enable shadow casting
+				spot_light->setShadowMapEnabled(true);
+				// up cast to cDirectionalLight
+				light = dynamic_cast<cDirectionalLight*>(spot_light);
+			}
 
 			light->setLocalPos(cVector3d(
 				light_ptr->position.x,
@@ -237,9 +244,9 @@ void URDFToChaiGraphicsWorld(const std::string& filename,
 
 			// define direction of light beam
 			light->setDir(
-				light_ptr->lookat.x,
-				light_ptr->lookat.y,
-				light_ptr->lookat.z);
+				light_ptr->lookat.x - light_ptr->position.x,
+				light_ptr->lookat.y - light_ptr->position.y,
+				light_ptr->lookat.z - light_ptr->position.z);
 			assert(light->getDir().length() != 0.0);
 		}
 		//TODO: support other chai light types
