@@ -53,6 +53,7 @@ Currently pending licensing. PLEASE DO NOT DISTRIBUTE.
 * Brian Soe
 * Mikael Jorda
 * Shameek Ganguly
+* Toki Migimatsu
 
 ### For questions, contact:
 manips.sai@gmail.com  
