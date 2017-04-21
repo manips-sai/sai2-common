@@ -161,15 +161,40 @@ void ModelInterface::taskInertiaMatrix(Eigen::MatrixXd& Lambda,
 	else
 	{
 		Eigen::MatrixXd inv_inertia = task_jacobian*_M_inv*task_jacobian.transpose();
-		// Lambda = inv_inertia.inverse();
-
-		// compute SVD pseudoinverse
-		// TODO: make class function?
-		Eigen::JacobiSVD<Eigen::MatrixXd> svd(inv_inertia, Eigen::ComputeThinU | Eigen::ComputeThinV);
-		static const double epsilon = std::numeric_limits<double>::epsilon();
-		double tolerance = epsilon * std::max(inv_inertia.cols(), inv_inertia.rows()) * svd.singularValues().array().abs()(0);
-		Lambda = svd.matrixV() * (svd.singularValues().array().abs() > tolerance).select(svd.singularValues().array().inverse(), 0).matrix().asDiagonal() * svd.matrixU().adjoint();
+		Lambda = inv_inertia.inverse();
 	}
+}
+
+// TODO : Untested
+void ModelInterface::taskInertiaMatrixWithPseudoInv(Eigen::MatrixXd& Lambda,
+    					   const Eigen::MatrixXd& task_jacobian)
+{
+	// check matrices have the right size
+	if (Lambda.rows() != Lambda.cols())
+	{
+		throw std::invalid_argument("Lambda matrix not square in ModelInterface::taskInertiaMatrixWithPseudoInv");
+		return;
+	}
+	else if (Lambda.rows() != task_jacobian.rows())
+	{
+		throw std::invalid_argument("Rows of Jacobian inconsistent with size of Lambda matrix in ModelInterface::taskInertiaMatrixWithPseudoInv");
+		return;
+	}
+	else if (task_jacobian.cols() != _model_internal->_dof)
+	{
+		throw std::invalid_argument("Jacobian size inconsistent with DOF of robot model in ModelInterface::taskInertiaMatrixWithPseudoInv");
+		return;
+	}
+
+	// compute task inertia
+	Eigen::MatrixXd inv_inertia = task_jacobian*_M_inv*task_jacobian.transpose();
+
+	// compute SVD pseudoinverse
+	// TODO: make class function?
+	Eigen::JacobiSVD<Eigen::MatrixXd> svd(inv_inertia, Eigen::ComputeThinU | Eigen::ComputeThinV);
+	const double epsilon = std::numeric_limits<double>::epsilon();
+	double tolerance = epsilon * std::max(inv_inertia.cols(), inv_inertia.rows()) * svd.singularValues().array().abs()(0);
+	Lambda = svd.matrixV() * (svd.singularValues().array().abs() > tolerance).select(svd.singularValues().array().inverse(), 0).matrix().asDiagonal() * svd.matrixU().adjoint();
 }
 
 //TODO : Untested

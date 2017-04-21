@@ -196,6 +196,14 @@ public :
     					   const Eigen::MatrixXd& task_jacobian);
 
     /**
+     * @brief Computes the operational space matrix robust to singularities
+     * @param Lambda Matrix on which the operational space mass matrix will be written
+     * @param task_jacobian The jacobian of the task for which we want the op space mass matrix
+     */
+    void taskInertiaMatrixWithPseudoInv(Eigen::MatrixXd& Lambda,
+    					   const Eigen::MatrixXd& task_jacobian);
+
+    /**
      * @brief      Computes the dynamically consistent inverse of the jacobian for a given task. Recomputes the task inertia at each call
      *
      * @param      Jbar           Matrix to which the dynamically consistent inverse will be written
