@@ -212,4 +212,61 @@ cCamera* ChaiGraphics::getCamera(const std::string& camera_name) {
 	return camera;
 }
 
+// Find link in parent generic object
+
+chai3d::cRobotLink* searchLinkInParent(const std::string& link_name, chai3d::cGenericObject* parent) {
+	cout<<"searching link at "<< parent->m_name <<endl;
+	chai3d::cRobotLink* link2; 
+	if (link_name == parent->m_name){
+		cout<<"Found the link!" <<endl;
+		return dynamic_cast<chai3d::cRobotLink*>(parent);
+	} 
+	for (unsigned int i=0; i< parent-> getNumChildren(); i++) {
+		cout<< parent->m_name <<" has " <<parent->getNumChildren()<< " children, and this is number: "<<i<<endl; 
+		if (parent->getChild(i)!=NULL) {
+		 	link2 = searchLinkInParent(link_name, parent->getChild(i)); 
+		 	if (link2 != NULL) {
+		 		return link2; 
+		 	}
+		} else {
+			//cout<<"unfortunately this child is null: "<<parent->getChild(i)<<endl; 
+			return NULL; 
+		}
+	}
+	return NULL;
+}
+// get link from robot name 
+
+
+chai3d::cRobotLink* getLink(const std::string& link_name, const std::string& robot_name) {
+	chai3d::cRobotLink* link = NULL; 
+	chai3d::cRobotBase* base = NULL;	
+	for (unsigned int i = 0; i < graphics->_world->getNumChildren(); ++i) {
+		cout<<i <<endl;
+		if (robot_name == graphics->_world->getChild(i)->m_name) {
+			//cout<<"found robot base" <<endl;
+			base = dynamic_cast<chai3d::cRobotBase*>(graphics->_world->getChild(i));
+			if (base!= NULL) {
+				break; 
+			}
+		}
+	}
+	if (base == NULL) {
+		cerr << "Could not find robot named " << link_name << endl;
+		abort();
+	}
+	for (unsigned int i=0; i< base-> getNumChildren(); i++) {
+			chai3d::cGenericObject* child = base->getChild(i);
+			if (child !=NULL) {
+				link= searchLinkInParent(link_name, child); 
+			}	
+	}		
+	if (link == NULL) {
+		cerr << "Could not find link named " << link_name << endl;
+		abort();
+		//TODO: throw exception instead
+	} 
+	return link; 		
+}
+
 }
