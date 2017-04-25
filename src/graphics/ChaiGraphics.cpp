@@ -77,15 +77,49 @@ static void updateGraphicsLink(cRobotLink* link, Model::ModelInterface* robot_mo
 	}
 }
 
+// get link from robot name 
+
+
+cRobotLink* ChaiGraphics::getLink(const std::string& link_name, const std::string& robot_name) {
+	chai3d::cRobotLink* link = NULL; 
+	chai3d::cRobotBase* base = NULL;	
+	for (unsigned int i = 0; i < _world->getNumChildren(); ++i) {
+		cout<<i <<endl;
+		if (robot_name == _world->getChild(i)->m_name) {
+			//cout<<"found robot base" <<endl;
+			base = dynamic_cast<chai3d::cRobotBase*>(_world->getChild(i));
+			if (base!= NULL) {
+				break; 
+			}
+		}
+	}
+	if (base == NULL) {
+		cerr << "Could not find robot named " << link_name << endl;
+		abort();
+	}
+	for (unsigned int i=0; i< base-> getNumChildren(); i++) {
+			chai3d::cGenericObject* child = base->getChild(i);
+			if (child !=NULL) {
+				link= searchLinkInParent(link_name, child); 
+			}	
+	}		
+	if (link == NULL) {
+		cerr << "Could not find link named " << link_name << endl;
+		abort();
+		//TODO: throw exception instead
+	} 
+	return link; 		
+}
+
 // update frame for a particular robot
 void ChaiGraphics::updateGraphics(const std::string& robot_name,
 									Model::ModelInterface* robot_model) {
 	// get robot base object in chai world
 	cRobotBase* base = NULL;
-	for (unsigned int i = 0; i < _world->getNumChildren(); ++i) {
+	for (unsigned int i = 0; i < (_world->getNumChildren()); ++i) {
 		if (robot_name == _world->getChild(i)->m_name) {
 			// cast to cRobotBase
-			base = dynamic_cast<cRobotBase*>(_world->getChild(i));
+			base = dynamic_cast<cRobotBase*>( _world->getChild(i));
 			if (base != NULL) {
 				break;
 			}
@@ -214,7 +248,7 @@ cCamera* ChaiGraphics::getCamera(const std::string& camera_name) {
 
 // Find link in parent generic object
 
-chai3d::cRobotLink* searchLinkInParent(const std::string& link_name, chai3d::cGenericObject* parent) {
+chai3d::cRobotLink* ChaiGraphics::searchLinkInParent(const std::string& link_name, chai3d::cGenericObject* parent) {
 	cout<<"searching link at "<< parent->m_name <<endl;
 	chai3d::cRobotLink* link2; 
 	if (link_name == parent->m_name){
@@ -235,38 +269,6 @@ chai3d::cRobotLink* searchLinkInParent(const std::string& link_name, chai3d::cGe
 	}
 	return NULL;
 }
-// get link from robot name 
 
-
-chai3d::cRobotLink* getLink(const std::string& link_name, const std::string& robot_name) {
-	chai3d::cRobotLink* link = NULL; 
-	chai3d::cRobotBase* base = NULL;	
-	for (unsigned int i = 0; i < graphics->_world->getNumChildren(); ++i) {
-		cout<<i <<endl;
-		if (robot_name == graphics->_world->getChild(i)->m_name) {
-			//cout<<"found robot base" <<endl;
-			base = dynamic_cast<chai3d::cRobotBase*>(graphics->_world->getChild(i));
-			if (base!= NULL) {
-				break; 
-			}
-		}
-	}
-	if (base == NULL) {
-		cerr << "Could not find robot named " << link_name << endl;
-		abort();
-	}
-	for (unsigned int i=0; i< base-> getNumChildren(); i++) {
-			chai3d::cGenericObject* child = base->getChild(i);
-			if (child !=NULL) {
-				link= searchLinkInParent(link_name, child); 
-			}	
-	}		
-	if (link == NULL) {
-		cerr << "Could not find link named " << link_name << endl;
-		abort();
-		//TODO: throw exception instead
-	} 
-	return link; 		
-}
 
 }

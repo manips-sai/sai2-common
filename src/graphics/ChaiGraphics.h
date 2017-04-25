@@ -70,6 +70,23 @@ public:
      * @param vertical Up vector for the camera.
      * @param lookat Point the camera is to look at.
      */
+
+           /**
+     * @brief recursively search for cRobotLink from cGenericObject parent
+     * @return cRobotLink with link_name (NULL if none found)
+     * @param link_name Link name
+     * @param parent cGenericObject parent you are searching the link in
+     */
+     chai3d::cRobotLink* searchLinkInParent(const std::string& link_name, chai3d::cGenericObject* parent);
+
+          /**
+     * @brief get robot link from robot
+     * @return cRobotLink with link_name (will abort if no link found)
+     * @param link_name Link name
+     * @param robot_name the name of the robot (will search in world for robot)
+     */
+     chai3d::cRobotLink* getLink(const std::string& link_name, const std::string& robot_name);
+     
      void setCameraPose(const std::string& camera_name,
                          const Eigen::Vector3d& position,
                          const Eigen::Vector3d& vertical,
@@ -103,22 +120,7 @@ public:
      */
      chai3d::cCamera* getCamera(const std::string& camera_name);
 
-         /**
-     * @brief recursively search for cRobotLink from cGenericObject parent
-     * @return cRobotLink with link_name (NULL if none found)
-     * @param link_name Link name
-     * @param parent cGenericObject parent you are searching the link in
-     */
-     chai3d::cRobotLink* searchLinkInParent(const std::string& link_name, chai3d::cGenericObject* parent);
-
-          /**
-     * @brief get robot link from robot
-     * @return cRobotLink with link_name (will abort if no link found)
-     * @param link_name Link name
-     * @param robot_name the name of the robot (will search in world for robot)
-     */
-     chai3d::cRobotLink* getLink(const std::string& link_name, const std::string& robot_name);
-     
+   
 
 public:
 	/**
