@@ -17,7 +17,7 @@ namespace Model
 
 enum ParserType {yml, urdf};
 
-enum ModelType {rbdl};
+enum ModelType {rbdl, rbdl_kuka};
 
 
 //forward define

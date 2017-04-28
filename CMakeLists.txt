@@ -5,6 +5,9 @@ SET (PROJECT_VERSION 0.1.0) #major version is zero for now since api will certai
 
 SET(CMAKE_CXX_FLAGS "-std=c++11 -I/usr/include -I/usr/local/include")
 
+# use KUKA proprietary dynamics library to compute the model class KukaRBDLModel. Default is OFF
+option(USE_KUKA_LBR_DYNAMICS "USE_KUKA_LBR_DYNAMICS" OFF)
+
 # set default build to release with debug info. mimic'ed from RBDL project.
 IF(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 	MESSAGE(STATUS "Setting build type to 'RelWithDebInfo' as none was specified.")
@@ -36,6 +39,15 @@ FIND_PACKAGE(RBDL QUIET)
 # include Parser
 SET(PARSER_SOURCE ${PROJECT_SOURCE_DIR}/src/parser/URDFToDynamics3d.cpp
 	${PROJECT_SOURCE_DIR}/src/parser/URDFToChaiGraphics.cpp)
+
+# KUKA LBR Dynamics
+if (USE_KUKA_LBR_DYNAMICS)
+    set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/../KukaIIWA/KukaLBRDynamics) # Need to manually set the correct directory
+    find_package (KukaLBRDynamics REQUIRED)
+    include_directories(${KukaLBRDynamics_INCLUDE_DIRS})
+    # target_link_libraries(${PROJECT_NAME} ${KukaLBRDynamics_LIBRARIES})
+    add_definitions(-DUSE_KUKA_LBR_DYNAMICS)
+endif(USE_KUKA_LBR_DYNAMICS)
 
 SET (SAI2-COMMON_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/src)
 
@@ -100,6 +112,7 @@ SET (SAI2-COMMON_LIBRARIES sai2-common
 	${CHAI3D_LIBRARIES}
 	${SAI2-SIMULATION_LIBRARIES}
 	${RBDL_LIBRARIES} ${RBDL_URDFREADER_LIBRARIES}
+	${KukaLBRDynamics_LIBRARIES}
 	)
 
 # 

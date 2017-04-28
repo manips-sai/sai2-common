@@ -9,6 +9,10 @@
 #include "ModelInternal.h"
 #include "RBDLModel.h"
 
+#ifdef USE_KUKA_LBR_DYNAMICS
+	#include "KukaRBDLModel.h"
+#endif
+
 #include <stdexcept>
 
 namespace Model{
@@ -22,6 +26,13 @@ ModelInterface::ModelInterface (const std::string path_to_model_file, Model::Mod
 	case rbdl :
 	    _model_internal = new RBDLModel(path_to_model_file, parser, verbose);
 	    break;
+
+    case rbdl_kuka : 
+    #ifdef USE_KUKA_LBR_DYNAMICS
+    	_model_internal = new KukaRBDLModel(path_to_model_file, parser, verbose);
+    	break;
+	#endif
+    	throw (std::runtime_error ("Compile sai2-common using KUKA_LBR_DYNAMICS option in order to use the kuka_rbdl model"));
 
 	default:
 	    throw (std::runtime_error ("ModelInterface : Unsupported model type"));
