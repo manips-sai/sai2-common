@@ -7,7 +7,6 @@
 
 #include "Sai2Simulation.h"
 #include <dynamics3d.h>
-
 #include "parser/URDFToDynamics3d.h"
 #include <math/CMatrix3d.h> // chai math library
 #include <stdexcept>
@@ -348,6 +347,15 @@ double Sai2Simulation::getCoeffFrictionDynamic(const std::string& robot_name,
 	assert(link);
 	cDynamicMaterial* mat = link->getDynamicMaterial();
 	return mat->getDynamicFriction();
+}
+
+// get pose of robot base in the world frame
+Eigen::Affine3d Sai2Simulation::getRobotBaseTransform(const std::string& robot_name) const {
+	Eigen::Affine3d gToRobotBase;
+	const auto base = _world->getBaseNode(robot_name);
+	gToRobotBase.translation() = base->getLocalPos().eigen();
+	gToRobotBase.linear() = base->getLocalRot().eigen();
+	return gToRobotBase;
 }
 
 }

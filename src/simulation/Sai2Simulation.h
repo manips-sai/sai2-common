@@ -10,6 +10,7 @@
 
 #include "SimulationInterface.h"
 #include "SimulationInternal.h"
+#include <Eigen/Geometry>
 
 // forward define from sai2-simulation
 class cDynamicWorld;
@@ -223,6 +224,13 @@ public:
       */
      double getCoeffFrictionDynamic(const std::string& robot_name,
                                         const std::string& link_name) const;
+
+     /**
+      * @brief      Get affine transform from the global frame to the base frame of a named robot
+      * @param      robot_name  Robot from which to get the value
+      * @return     Transform
+      */
+     Eigen::Affine3d getRobotBaseTransform(const std::string& robot_name) const;
 
 public:
 	/**

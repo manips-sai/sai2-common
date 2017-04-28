@@ -205,6 +205,8 @@ void URDFToDynamics3dWorld(const std::string& filename, cDynamicWorld* world, bo
 			tmp_cvec3,
 			tmp_cmat3);
 		assert(robot);
+		robot->setLocalPos(tmp_cvec3);
+		robot->setLocalRot(tmp_cmat3);
 
 		// load robot from file
 		URDFToDynamics3dRobot(robot_spec->model_filename, robot, verbose, robot_spec->model_working_dir);
