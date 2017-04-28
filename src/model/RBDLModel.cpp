@@ -112,6 +112,18 @@ void RBDLModel::J_0(Eigen::MatrixXd& J,
 		 J_temp.block(0,0,3,_dof);
 }
 
+void RBDLModel::J(Eigen::MatrixXd& J,
+	const std::string& link_name,
+	const Eigen::Vector3d& pos_in_link,
+	const Eigen::VectorXd& q)
+{
+	if (J.rows()!=6 || J.cols()!=_dof) // resize to the right format
+	{
+		J.setZero(6,_dof);
+	}
+	CalcPointJacobian6D (_rbdl_model, q, linkId(link_name), pos_in_link, J, false);
+}
+
 
 
 void RBDLModel::Jv(Eigen::MatrixXd& J,

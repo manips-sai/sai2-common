@@ -61,13 +61,25 @@ public:
                                const Eigen::VectorXd& dq);
 
     /**
-     * @brief Full jacobian for link, relative to base (id=0)
+     * @brief Full jacobian for link, relative to base (id=0) in the form [Jv; Jw]
      * @param J Matrix to which the jacobian will be written
      * @param link_name the name of the link where to compute the jacobian
      * @param pos_in_link the position of the point in the link where the jacobian is computed (in local link frame)
      * @param q Joint positions
      */
     virtual void J_0(Eigen::MatrixXd& J,
+                   const std::string& link_name,
+                   const Eigen::Vector3d& pos_in_link,
+                   const Eigen::VectorXd& q);
+
+    /**
+     * @brief Full jacobian for link, relative to base (id=0) in the form [Jv; Jw]
+     * @param J Matrix to which the jacobian will be written
+     * @param link_name the name of the link where to compute the jacobian
+     * @param pos_in_link the position of the point in the link where the jacobian is computed (in local link frame)
+     * @param q Joint positions
+     */
+    virtual void J(Eigen::MatrixXd& J,
                    const std::string& link_name,
                    const Eigen::Vector3d& pos_in_link,
                    const Eigen::VectorXd& q);
