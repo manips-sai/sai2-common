@@ -72,7 +72,7 @@ public:
      * @param pos_in_link the position of the point in the link where the jacobian is computed (in local link frame)
      * @param q Joint positions
      */
-    virtual void J(Eigen::MatrixXd& J,
+    virtual void J_0(Eigen::MatrixXd& J,
                    const std::string& link_name,
                    const Eigen::Vector3d& pos_in_link,
                    const Eigen::VectorXd& q) = 0;

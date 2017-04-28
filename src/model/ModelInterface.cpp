@@ -67,10 +67,10 @@ void ModelInterface::gravityVector(Eigen::VectorXd& g,
 void ModelInterface::coriolisForce(Eigen::VectorXd& b)
 {_model_internal->coriolisForce(b,_q,_dq);}
 
-void ModelInterface::J(Eigen::MatrixXd& J,
+void ModelInterface::J_0(Eigen::MatrixXd& J,
                        const std::string& link_name,
                        const Eigen::Vector3d& pos_in_link)
-{_model_internal->J(J,link_name,pos_in_link,_q);}
+{_model_internal->J_0(J,link_name,pos_in_link,_q);}
 
 void ModelInterface::Jv(Eigen::MatrixXd& J,
                         const std::string& link_name,
