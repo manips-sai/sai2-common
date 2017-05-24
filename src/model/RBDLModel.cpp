@@ -250,5 +250,15 @@ void RBDLModel::getLinkMass(double& mass,
 	inertia = b.mInertia;
 }
 
+void RBDLModel::getLinkMass(double& mass,
+ Eigen::Vector3d& center_of_mass,
+ const std::string& link_name)
+{
+	RigidBodyDynamics::Body b = _rbdl_model.mBodies[linkId(link_name)];
+
+	mass = b.mMass;
+	center_of_mass = b.mCenterOfMass;
+}
+
 
 } /* namespace Model */
