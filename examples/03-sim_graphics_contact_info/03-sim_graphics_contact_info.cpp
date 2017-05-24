@@ -4,6 +4,7 @@
 
 #include "model/ModelInterface.h"
 #include "simulation/SimulationInterface.h"
+#include "simulation/Sai2Simulation.h"
 #include "graphics/GraphicsInterface.h"
 
 #include <GLFW/glfw3.h> //must be loaded after loading opengl/glew
@@ -31,7 +32,7 @@ int main() {
 	cout << "Loading URDF world model file: " << world_file << endl;
 
 	// load simulation world
-	auto sim = new Simulation::SimulationInterface(world_file, Simulation::sai2simulation, Simulation::urdf, false);
+	auto sim = new Simulation::Sai2Simulation(world_file, Simulation::urdf, false);
 
 	// load graphics scene
 	auto graphics = new Graphics::GraphicsInterface(world_file, Graphics::chai, Graphics::urdf, true);
@@ -76,6 +77,8 @@ int main() {
 
 	std::vector<Eigen::Vector3d> contact_points;
 	std::vector<Eigen::Vector3d> contact_forces;
+
+	sim->setCollisionRestitution(0);
 
     // while window is open:
     while (!glfwWindowShouldClose(window))
