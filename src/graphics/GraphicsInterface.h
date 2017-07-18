@@ -81,6 +81,8 @@ public:
                          Eigen::Vector3d& ret_vertical,
                          Eigen::Vector3d& ret_lookat);
 
+     
+
      /**
      * @brief Sets the pose of the camera in the parent frame
      * @param camera_name Camera name.
