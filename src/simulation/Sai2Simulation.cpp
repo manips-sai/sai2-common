@@ -232,7 +232,8 @@ void Sai2Simulation::getContactList(std::vector<Eigen::Vector3d>& contact_points
 	        	for(int l=0; l<3; l++)
 	        	{
 		        	current_position(l) = contact->m_globalPos(l);
-		        	current_force(l) = contact->m_globalNormalForce(l) + contact->m_globalFrictionForce(l);
+		        	// the friction force is inverted for some reason. Need to substract it to get a coherent result.
+		        	current_force(l) = contact->m_globalNormalForce(l) - contact->m_globalFrictionForce(l);
 	        	}
 	        	// reverse the sign to get the list of forces applied to the considered object
 	        	contact_points.push_back(current_position);
