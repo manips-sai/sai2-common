@@ -85,6 +85,10 @@ SET(GRAPHICS_SOURCE ${PROJECT_SOURCE_DIR}/src/graphics/GraphicsInterface.cpp
 SET(MODEL_SOURCE ${PROJECT_SOURCE_DIR}/src/model/ModelInterface.cpp
 	${PROJECT_SOURCE_DIR}/src/model/RBDLModel.cpp)
 
+# include Force Sensor
+SET(FORCE_SENSOR_SOURCE ${PROJECT_SOURCE_DIR}/src/force_sensor/ForceSensorSim.h
+	${PROJECT_SOURCE_DIR}/src/force_sensor/ForceSensorDisplay.h)
+
 # Add the include directory to the include paths
 INCLUDE_DIRECTORIES (
 	${PROJECT_SOURCE_DIR}/src

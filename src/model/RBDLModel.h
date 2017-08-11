@@ -204,6 +204,30 @@ public:
      */
     unsigned int linkId(const std::string& link_name);
 
+    /* RBDL Model specific interface */
+
+    /**
+     * @brief Gives the mass properties of a given link
+     * @param mass the returned mass value
+     * @param center_of_mass the position of the center of mass in the body's frame
+     * @param inertia the inertia of the given link
+     * @param link_name the name of the considered link
+     */
+    void getLinkMass(double& mass,
+                     Eigen::Vector3d& center_of_mass,
+                     Eigen::Matrix3d& inertia,
+                     const std::string& link_name);
+
+    /**
+     * @brief Gives the mass properties of a given link
+     * @param mass the returned mass value
+     * @param center_of_mass the position of the center of mass in the body's frame
+     * @param link_name the name of the considered link
+     */
+    void getLinkMass(double& mass,
+                     Eigen::Vector3d& center_of_mass,
+                     const std::string& link_name);
+
 
     RigidBodyDynamics::Model _rbdl_model;
 
