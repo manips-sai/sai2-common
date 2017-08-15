@@ -11,6 +11,8 @@
 #include <Eigen/Dense>
 #include <Eigen/Geometry>
 #include <string>
+#include <vector>
+#include <algorithm>
 
 namespace Model
 {
@@ -19,6 +21,7 @@ enum ParserType {yml, urdf};
 
 enum ModelType {rbdl, rbdl_kuka};
 
+enum ContactNature {PointContact, SurfaceContact};
 
 //forward define
 class ModelInternal;
@@ -270,6 +273,42 @@ public :
                                     const Eigen::MatrixXd& task_jacobian,
                                     const Eigen::MatrixXd& N_prec);
 
+   
+    /**
+     * @brief Computes the grasp matrix in the cases where there are 
+     * 2, 3 or 4 contact points.
+     * @param G  :  The grasp matrix that is going to be populated
+     * @param R : the rotation matrix between the world frame and the frame attached to the object (useful when 2 contacts only)
+     * @param link_names  :  a vector of the names of the links where the contact occur
+     * @param pos_in_links  :  a vector of the position of the contact in each link
+     * @param contact_natures  :  a vector containing the nature of each contact (we only consider point contact and surface contact)
+     * @param center_point  :  The position (in world frame) of the point on which we resolve the resultant forces and moments
+     */
+    void GraspMatrix(Eigen::MatrixXd& G,
+                     Eigen::Matrix3d& R,
+                     const std::vector<std::string> link_names,
+                     const std::vector<Eigen::Vector3d> pos_in_links,
+                     const std::vector<ContactNature> contact_natures,
+                     const Eigen::Vector3d center_point);
+
+    /**
+     * @brief Computes the grasp matrix in the cases where there are 
+     * 2, 3 or 4 contact points.
+     * @param G  :  The grasp matrix that is going to be populated
+     * @param R : the rotation matrix between the world frame and the frame attached to the object (useful when 2 contacts only)
+     * @param geopetric_center  :  The position (in world frame) of the geometric center (found and returned by the function) on which we resolve the resultant forces and moments
+     * @param link_names  :  a vector of the names of the links where the contact occur
+     * @param pos_in_links  :  a vector of the position of the contact in each link
+     * @param contact_natures  :  a vector containing the nature of each contact (we only consider point contact and surface contact)
+     */
+    void GraspMatrixAtGeometricCenter(Eigen::MatrixXd& G,
+                     Eigen::Matrix3d& R,
+                     Eigen::Vector3d& geometric_center,
+                     const std::vector<std::string> link_names,
+                     const std::vector<Eigen::Vector3d> pos_in_links,
+                     const std::vector<ContactNature> contact_natures);
+
+
     /// \brief pointer to the internal specific model
     ModelInternal* _model_internal;
 
@@ -289,6 +328,18 @@ public :
 
     /// \brief Inverse of the mass matrix
     Eigen::MatrixXd _M_inv;
+
+protected:
+    /// \brief compute the cross product operator of a 3d vector
+    static Eigen::Matrix3d CrossProductOperator(const Eigen::Vector3d& v)
+    {
+        Eigen::Matrix3d v_hat;
+        v_hat << 0, -v(2), v(1),
+                v(2), 0, -v(0),
+                -v(1), v(0), 0;
+        return v_hat;
+    }
+
 
 };
 
