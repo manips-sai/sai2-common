@@ -370,7 +370,6 @@ void ModelInterface::GraspMatrix(Eigen::MatrixXd& G,
 		position(pi, link_names[i], pos_in_links[i]);
 		positions_in_world.push_back(pi);
 		Eigen::Vector3d ri = pi-center_point;
-		// std::cout << "i : " << i << "ri : " << ri.transpose() << std::endl;
 		Wf.block<3,3>(0,3*i) = Eigen::Matrix3d::Identity();
 		Wf.block<3,3>(3,3*i) = CrossProductOperator(ri);
 	}
@@ -390,6 +389,7 @@ void ModelInterface::GraspMatrix(Eigen::MatrixXd& G,
 			
 			// compute the point to point vectors
 			Eigen::Vector3d e12 = positions_in_world[1] - positions_in_world[0];
+			e12.normalize();
 
 			// fill in E matrix
 			E.block<3,1>(0,0) = -e12;
@@ -399,7 +399,7 @@ void ModelInterface::GraspMatrix(Eigen::MatrixXd& G,
 			Eigen::MatrixXd Ebar = (E.transpose()*E).inverse() * E.transpose();
 
 			// find R
-			Eigen::Vector3d x = e12.normalized();
+			Eigen::Vector3d x = e12;
 			if(abs(x(0)-1) < 1e-3) // new x is aligned with world x
 			{
 				R = Eigen::Matrix3d::Identity();
@@ -487,6 +487,10 @@ void ModelInterface::GraspMatrix(Eigen::MatrixXd& G,
 			Eigen::Vector3d e13 = positions_in_world[2] - positions_in_world[0];
 			Eigen::Vector3d e23 = positions_in_world[2] - positions_in_world[1];
 
+			e12.normalize();
+			e13.normalize();
+			e23.normalize();
+
 			// fill in E matrix
 			E.block<3,1>(0,0) = -e12;
 			E.block<3,1>(3,0) = e12;
@@ -570,6 +574,13 @@ void ModelInterface::GraspMatrix(Eigen::MatrixXd& G,
 			Eigen::Vector3d e23 = positions_in_world[2] - positions_in_world[1];
 			Eigen::Vector3d e24 = positions_in_world[3] - positions_in_world[1];
 			Eigen::Vector3d e34 = positions_in_world[3] - positions_in_world[2];
+
+			e12.normalize();
+			e13.normalize();
+			e14.normalize();
+			e23.normalize();
+			e24.normalize();
+			e34.normalize();
 
 			// fill in E matrix
 			E.block<3,1>(0,0) = -e12;
