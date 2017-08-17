@@ -12,7 +12,7 @@
 #include <Eigen/Geometry>
 #include <string>
 #include <vector>
-#include <algorithm>
+#include <cmath>
 
 namespace Model
 {

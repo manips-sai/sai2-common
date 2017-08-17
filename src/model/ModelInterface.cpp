@@ -400,9 +400,24 @@ void ModelInterface::GraspMatrix(Eigen::MatrixXd& G,
 
 			// find R
 			Eigen::Vector3d x = e12;
-			if(abs(x(0)-1) < 1e-3) // new x is aligned with world x
+			// std::cout << "new x : " << x.transpose() << std::endl;
+			// std::cout << "new x cross world x : " << (x.cross(Eigen::Vector3d(1,0,0))).transpose() << std::endl;
+			// std::cout << "new x cross world x norm : " << (x.cross(Eigen::Vector3d(1,0,0))).norm() << std::endl;
+			// std::cout << "abs : " << std::abs((x.cross(Eigen::Vector3d(1,0,0))).norm()) << std::endl;
+			// std::cout << std::endl;
+			if(std::abs((x.cross(Eigen::Vector3d(1,0,0))).norm()) < 1e-3) // new x is aligned with world x
 			{
-				R = Eigen::Matrix3d::Identity();
+				if(x.dot(Eigen::Vector3d(1,0,0)) > 0) // same direction
+				{
+					R = Eigen::Matrix3d::Identity();
+					// std::cout << "R is identity" << std::endl;
+				}
+				else // rotation around Z axis by 180 degrees
+				{
+					R << -1, 0, 0,
+						 0, -1, 0, 
+						 0, 0, 1;
+				}
 			}
 			else
 			{
