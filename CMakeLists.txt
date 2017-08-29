@@ -3,10 +3,8 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.8.12)
 PROJECT (SAI2-COMMON)
 SET (PROJECT_VERSION 0.1.0) #major version is zero for now since api will certainly change in future
 
-SET(CMAKE_CXX_FLAGS "-std=c++11 -I/usr/include -I/usr/local/include")
-
-# use KUKA proprietary dynamics library to compute the model class KukaRBDLModel. Default is OFF
-option(USE_KUKA_LBR_DYNAMICS "USE_KUKA_LBR_DYNAMICS" OFF)
+SET(CMAKE_CXX_STANDARD 11)
+include_directories(/usr/include /usr/local/include)
 
 # set default build to release with debug info. mimic'ed from RBDL project.
 IF(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
@@ -19,19 +17,45 @@ ENDIF()
 # include Chai3d (required by Dynamics3D)
 # -- this is required by Chai3d to pick the correct path for OpenGL headers
 FIND_PACKAGE(CHAI3D REQUIRED)
-ADD_DEFINITIONS(${CHAI3D_DEFINITIONS})
-if (CMAKE_SYSTEM_NAME MATCHES Darwin) 
-  ADD_DEFINITIONS(-D_MACOSX -DMACOSX)
-elseif (CMAKE_SYSTEM_NAME MATCHES Linux)
-  ADD_DEFINITIONS(-D_LINUX -DLINUX)
-endif () #NOTE: Windows is currently unsupported
+# Find full path to libchai3d and libdrd and replace their entries CHAI3D_LIBRARIES
+FIND_LIBRARY(CHAI3D_LIBRARY chai3d paths ${CHAI3D_DIR})
+FIND_LIBRARY(DRD_LIBRARY drd PATHS ${CHAI3D_LIBRARY_DIRS})
+SET(${CHAI3D_LIBRARIES_FULLPATH} "")
+FOREACH(lib ${CHAI3D_LIBRARIES})
+	IF(${lib} MATCHES chai3d)
+		LIST(APPEND CHAI3D_LIBRARIES_FULLPATH ${CHAI3D_LIBRARY})
+		CONTINUE()
+	ELSEIF(${lib} MATCHES drd)
+		LIST(APPEND CHAI3D_LIBRARIES_FULLPATH ${DRD_LIBRARY})
+		CONTINUE()
+	ENDIF()
+	LIST(APPEND CHAI3D_LIBRARIES_FULLPATH ${lib})
+ENDFOREACH(lib)
+SET(CHAI3D_LIBRARIES ${CHAI3D_LIBRARIES_FULLPATH})
+
 LINK_DIRECTORIES(${CHAI3D_LIBRARY_DIRS})
+# ADD_DEFINITIONS(${CHAI3D_DEFINITIONS})
+# if (CMAKE_SYSTEM_NAME MATCHES Darwin)
+#   ADD_DEFINITIONS(-D_MACOSX -DMACOSX)
+# elseif (CMAKE_SYSTEM_NAME MATCHES Linux)
+#   ADD_DEFINITIONS(-D_LINUX -DLINUX)
+# endif () #NOTE: Windows is currently unsupported
 
 # include Sai2-Simulation
 FIND_PACKAGE(SAI2-SIMULATION REQUIRED)
+ADD_DEFINITIONS(${SAI2-SIMULATION_DEFINITIONS})
+FIND_LIBRARY(SAI2-SIMULATION_LIBRARIES_FULLPATH sai2-simulation PATHS ${SAI2-SIMULATION_DIR})
+SET(SAI2-SIMULATION_LIBRARIES ${SAI2-SIMULATION_LIBRARIES_FULLPATH})
 
 # include Eigen
-FIND_PACKAGE(Eigen3 REQUIRED)
+set(EIGEN3_INCLUDE_DIR $ENV{EIGEN3_INCLUDE_DIR})
+if(NOT EIGEN3_INCLUDE_DIR)
+	find_package(Eigen3 QUIET)
+	# TODO: Find automatic way to find for Ubuntu 14.04
+	if(NOT EIGEN3_INCLUDE_DIR)
+		set(EIGEN3_INCLUDE_DIR /usr/include/eigen3)
+	endif()
+endif()
 
 # include RBDL
 FIND_PACKAGE(RBDL QUIET)
@@ -39,17 +63,6 @@ FIND_PACKAGE(RBDL QUIET)
 # include Parser
 SET(PARSER_SOURCE ${PROJECT_SOURCE_DIR}/src/parser/URDFToDynamics3d.cpp
 	${PROJECT_SOURCE_DIR}/src/parser/URDFToChaiGraphics.cpp)
-
-# KUKA LBR Dynamics
-if (USE_KUKA_LBR_DYNAMICS)
-    set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/../KukaIIWA/KukaLBRDynamics) # Need to manually set the correct directory
-    find_package (KukaLBRDynamics REQUIRED)
-    include_directories(${KukaLBRDynamics_INCLUDE_DIRS})
-    # target_link_libraries(${PROJECT_NAME} ${KukaLBRDynamics_LIBRARIES})
-    add_definitions(-DUSE_KUKA_LBR_DYNAMICS)
-endif(USE_KUKA_LBR_DYNAMICS)
-
-SET (SAI2-COMMON_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/src)
 
 # include urdf, compiled with application
 SET(URDF_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/src/parser/)
@@ -90,41 +103,53 @@ SET(FORCE_SENSOR_SOURCE ${PROJECT_SOURCE_DIR}/src/force_sensor/ForceSensorSim.h
 	${PROJECT_SOURCE_DIR}/src/force_sensor/ForceSensorDisplay.h)
 
 # Add the include directory to the include paths
-INCLUDE_DIRECTORIES (
+SET (SAI2-COMMON_INCLUDE_DIRS
 	${PROJECT_SOURCE_DIR}/src
-	${URDF_INCLUDE_DIR}
-	${CHAI3D_INCLUDE_DIRS}
 	${EIGEN3_INCLUDE_DIR}
 	${SAI2-SIMULATION_INCLUDE_DIRS}
+	${CHAI3D_INCLUDE_DIRS}
 	${RBDL_INCLUDE_DIR}
-	)
+)
+INCLUDE_DIRECTORIES (
+	${SAI2-COMMON_INCLUDE_DIRS}
+	${URDF_INCLUDE_DIR}
+)
 
 # Create the library
-ADD_LIBRARY (sai2-common STATIC
+ADD_LIBRARY (sai2-common-source STATIC
 	${URDF_SOURCE}
 	${PARSER_SOURCE}
 	${SIMULATION_SOURCE}
 	${GRAPHICS_SOURCE}
 	${MODEL_SOURCE}
-	)
+)
 
 FIND_LIBRARY(TINYXML_LIBRARIES tinyxml2)
 FIND_LIBRARY(RBDL_LIBRARIES rbdl)
 FIND_LIBRARY(RBDL_URDFREADER_LIBRARIES rbdl_urdfreader)
-SET (SAI2-COMMON_LIBRARIES sai2-common 
+SET(SAI2-COMMON_DEPENDENCIES 
 	${TINYXML_LIBRARIES}
 	${CHAI3D_LIBRARIES}
 	${SAI2-SIMULATION_LIBRARIES}
 	${RBDL_LIBRARIES} ${RBDL_URDFREADER_LIBRARIES}
 	${KukaLBRDynamics_LIBRARIES}
-	)
+)
+TARGET_LINK_LIBRARIES(sai2-common-source ${SAI2-COMMON_DEPENDENCIES})
+ADD_LIBRARY(sai2-common INTERFACE)
+TARGET_LINK_LIBRARIES(sai2-common INTERFACE
+	sai2-common-source
+	${SAI2-COMMON_DEPENDENCIES}
+)
+SET(SAI2-COMMON_LIBRARIES
+	sai2-common
+)
 
 # 
 # export package
 # 
 
 # export package for use from the build tree
-EXPORT (TARGETS sai2-common FILE ${PROJECT_BINARY_DIR}/SAI2-COMMONTargets.cmake)
+EXPORT (TARGETS sai2-common sai2-common-source FILE ${PROJECT_BINARY_DIR}/SAI2-COMMONTargets.cmake)
 EXPORT (PACKAGE SAI2-COMMON)
 
 # configure package
