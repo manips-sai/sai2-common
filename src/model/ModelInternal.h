@@ -207,6 +207,8 @@ public:
     /// \brief Degrees of freedom of the robot
     int _dof;
 
+    /// \brief Virtual destructor
+    virtual ~ModelInternal() { }
 };
 
 } /* namespace Model */

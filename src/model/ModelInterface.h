@@ -42,7 +42,7 @@ public:
                     Model::ParserType parser,
                     bool verbose = false);
 
-    ~ModelInterface ();
+    virtual ~ModelInterface ();
 
     /**
      * @brief update the model. call after updating joint positions, velocities and acceleration.
@@ -50,7 +50,7 @@ public:
      * The other functions are accessors only.
      * The jacobian functions will compute the jacobians based on the robot configuration when updatedModel was last called
      */
-    void updateModel();
+    virtual void updateModel();
 
 protected :
     /**
