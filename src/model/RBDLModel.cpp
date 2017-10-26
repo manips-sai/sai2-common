@@ -11,7 +11,7 @@
 #ifndef RBDL_BUILD_ADDON_URDFREADER
 	#error "Error: RBDL addon urdfmodel not enabled."
 #endif
-#include <rbdl/addons/urdfreader/urdfreader.h>
+#include <urdfreader/urdfreader.h>
 
 #include <stdexcept>
 

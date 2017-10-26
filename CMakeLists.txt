@@ -35,6 +35,11 @@ FIND_PACKAGE(Eigen3 REQUIRED)
 
 # include RBDL
 FIND_PACKAGE(RBDL QUIET)
+if(NOT RBDL_FOUND)
+	# --- if RBDL is not installed globally, assumes it is in sai2/3rdParty/rbdl
+	set(RBDL_LOCAL_DIR ../3rdParty/rbdl)
+	set(RBDL_INCLUDE_DIR ${RBDL_LOCAL_DIR}/include ${RBDL_LOCAL_DIR}/build/include ${RBDL_LOCAL_DIR}/addons)
+endif()
 
 # include Parser
 SET(PARSER_SOURCE ${PROJECT_SOURCE_DIR}/src/parser/URDFToDynamics3d.cpp
@@ -111,6 +116,10 @@ ADD_LIBRARY (sai2-common STATIC
 FIND_LIBRARY(TINYXML_LIBRARIES tinyxml2)
 FIND_LIBRARY(RBDL_LIBRARIES rbdl)
 FIND_LIBRARY(RBDL_URDFREADER_LIBRARIES rbdl_urdfreader)
+if(NOT RBDL_FOUND)
+	FIND_LIBRARY(RBDL_LIBRARIES rbdl PATHS ${RBDL_LOCAL_DIR}/build)
+	FIND_LIBRARY(RBDL_URDFREADER_LIBRARIES rbdl_urdfreader PATHS ${RBDL_LOCAL_DIR}/build/addons/urdfreader)
+endif()
 SET (SAI2-COMMON_LIBRARIES sai2-common 
 	${TINYXML_LIBRARIES}
 	${CHAI3D_LIBRARIES}
