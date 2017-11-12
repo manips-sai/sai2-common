@@ -45,6 +45,17 @@ endif()
 SET(PARSER_SOURCE ${PROJECT_SOURCE_DIR}/src/parser/URDFToDynamics3d.cpp
 	${PROJECT_SOURCE_DIR}/src/parser/URDFToChaiGraphics.cpp)
 
+# - jsoncpp
+if (CMAKE_SYSTEM_NAME MATCHES Darwin) 
+	find_library(JSONCPP_LIBRARY jsoncpp)
+elseif (CMAKE_SYSTEM_NAME MATCHES Linux)
+	find_package(PkgConfig REQUIRED)
+	pkg_check_modules(JSONCPP jsoncpp)
+	include_directories(${JSONCPP_INCLUDE_DIRS})
+	link_directories(${JSONCPP_LIBRARY_DIRS})
+	set(JSONCPP_LIBRARY ${JSONCPP_LIBRARIES})
+endif ()
+
 # KUKA LBR Dynamics
 if (USE_KUKA_LBR_DYNAMICS)
     set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/../KukaIIWA/KukaLBRDynamics) # Need to manually set the correct directory
@@ -54,7 +65,7 @@ if (USE_KUKA_LBR_DYNAMICS)
     add_definitions(-DUSE_KUKA_LBR_DYNAMICS)
 endif(USE_KUKA_LBR_DYNAMICS)
 
-SET (SAI2-COMMON_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/src)
+SET (SAI2-COMMON_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/src ${RBDL_INCLUDE_DIR})
 
 # include urdf, compiled with application
 SET(URDF_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/src/parser/)
@@ -94,6 +105,12 @@ SET(MODEL_SOURCE ${PROJECT_SOURCE_DIR}/src/model/ModelInterface.cpp
 SET(FORCE_SENSOR_SOURCE ${PROJECT_SOURCE_DIR}/src/force_sensor/ForceSensorSim.h
 	${PROJECT_SOURCE_DIR}/src/force_sensor/ForceSensorDisplay.h)
 
+# include Redis
+SET(REDIS_SOURCE ${PROJECT_SOURCE_DIR}/src/redis/RedisClient.cpp)
+
+# include Timer
+SET(TIMER_SOURCE ${PROJECT_SOURCE_DIR}/src/timer/LoopTimer.cpp)
+
 # Add the include directory to the include paths
 INCLUDE_DIRECTORIES (
 	${PROJECT_SOURCE_DIR}/src
@@ -111,6 +128,8 @@ ADD_LIBRARY (sai2-common STATIC
 	${SIMULATION_SOURCE}
 	${GRAPHICS_SOURCE}
 	${MODEL_SOURCE}
+	${REDIS_SOURCE}
+	${TIMER_SOURCE}
 	)
 
 FIND_LIBRARY(TINYXML_LIBRARIES tinyxml2)
