@@ -27,8 +27,17 @@ elseif (CMAKE_SYSTEM_NAME MATCHES Linux)
 endif () #NOTE: Windows is currently unsupported
 LINK_DIRECTORIES(${CHAI3D_LIBRARY_DIRS})
 
+#include Sai2-Urdf
+FIND_PACKAGE(SAI2-URDF REQUIRED)
+
 # include Sai2-Simulation
 FIND_PACKAGE(SAI2-SIMULATION REQUIRED)
+
+# include Sai2-Model
+FIND_PACKAGE(SAI2-MODEL REQUIRED)
+
+# include Sai2-Graphics
+FIND_PACKAGE(SAI2-GRAPHICS REQUIRED)
 
 # include Eigen
 FIND_PACKAGE(Eigen3 REQUIRED)
@@ -36,54 +45,7 @@ FIND_PACKAGE(Eigen3 REQUIRED)
 # include RBDL
 FIND_PACKAGE(RBDL QUIET)
 
-# include Parser
-SET(PARSER_SOURCE ${PROJECT_SOURCE_DIR}/src/parser/URDFToDynamics3d.cpp
-	${PROJECT_SOURCE_DIR}/src/parser/URDFToChaiGraphics.cpp)
-
-# KUKA LBR Dynamics
-if (USE_KUKA_LBR_DYNAMICS)
-    set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/../KukaIIWA/KukaLBRDynamics) # Need to manually set the correct directory
-    find_package (KukaLBRDynamics REQUIRED)
-    include_directories(${KukaLBRDynamics_INCLUDE_DIRS})
-    # target_link_libraries(${PROJECT_NAME} ${KukaLBRDynamics_LIBRARIES})
-    add_definitions(-DUSE_KUKA_LBR_DYNAMICS)
-endif(USE_KUKA_LBR_DYNAMICS)
-
 SET (SAI2-COMMON_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/src)
-
-# include urdf, compiled with application
-SET(URDF_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/src/parser/)
-SET(URDF_SOURCE ${URDF_INCLUDE_DIR}/urdf/urdfdom/urdf_parser/src/pose.cpp
-		${URDF_INCLUDE_DIR}/urdf/urdfdom/urdf_parser/src/link.cpp
-		${URDF_INCLUDE_DIR}/urdf/urdfdom/urdf_parser/src/graphics.cpp
-		${URDF_INCLUDE_DIR}/urdf/urdfdom/urdf_parser/src/world.cpp
-		${URDF_INCLUDE_DIR}/urdf/urdfdom/urdf_parser/src/model.cpp
-		${URDF_INCLUDE_DIR}/urdf/urdfdom/urdf_parser/src/joint.cpp
-		${URDF_INCLUDE_DIR}/urdf/urdfdom/urdf_parser/include/urdf_parser/urdf_parser.h
-		${URDF_INCLUDE_DIR}/urdf/urdfdom_headers/urdf_exception/include/urdf_exception/exception.h
-		${URDF_INCLUDE_DIR}/urdf/urdfdom_headers/urdf_model/include/urdf_model/pose.h
-		${URDF_INCLUDE_DIR}/urdf/urdfdom_headers/urdf_world/include/urdf_world/world.h
-		${URDF_INCLUDE_DIR}/urdf/urdfdom_headers/urdf_model/include/urdf_model/model.h
-		${URDF_INCLUDE_DIR}/urdf/urdfdom_headers/urdf_model/include/urdf_model/link.h
-		${URDF_INCLUDE_DIR}/urdf/urdfdom_headers/urdf_model/include/urdf_model/joint.h
-		${URDF_INCLUDE_DIR}/urdf/boost_replacement/lexical_cast.h
-		${URDF_INCLUDE_DIR}/urdf/boost_replacement/shared_ptr.h
-		${URDF_INCLUDE_DIR}/urdf/boost_replacement/printf_console.cpp
-		${URDF_INCLUDE_DIR}/urdf/boost_replacement/printf_console.h
-		${URDF_INCLUDE_DIR}/urdf/boost_replacement/string_split.cpp
-		${URDF_INCLUDE_DIR}/urdf/boost_replacement/string_split.h)
-
-# include Simulation
-SET(SIMULATION_SOURCE ${PROJECT_SOURCE_DIR}/src/simulation/SimulationInterface.cpp
-	${PROJECT_SOURCE_DIR}/src/simulation/Sai2Simulation.cpp)
-
-# include Graphics
-SET(GRAPHICS_SOURCE ${PROJECT_SOURCE_DIR}/src/graphics/GraphicsInterface.cpp
-	${PROJECT_SOURCE_DIR}/src/graphics/ChaiGraphics.cpp)
-
-# include Model
-SET(MODEL_SOURCE ${PROJECT_SOURCE_DIR}/src/model/ModelInterface.cpp
-	${PROJECT_SOURCE_DIR}/src/model/RBDLModel.cpp)
 
 # include Force Sensor
 SET(FORCE_SENSOR_SOURCE ${PROJECT_SOURCE_DIR}/src/force_sensor/ForceSensorSim.h
@@ -92,31 +54,24 @@ SET(FORCE_SENSOR_SOURCE ${PROJECT_SOURCE_DIR}/src/force_sensor/ForceSensorSim.h
 # Add the include directory to the include paths
 INCLUDE_DIRECTORIES (
 	${PROJECT_SOURCE_DIR}/src
-	${URDF_INCLUDE_DIR}
 	${CHAI3D_INCLUDE_DIRS}
 	${EIGEN3_INCLUDE_DIR}
+	${SAI2-URDF_INCLUDE_DIRS}
 	${SAI2-SIMULATION_INCLUDE_DIRS}
+	${SAI2-MODEL_INCLUDE_DIRS}
+	${SAI2-GRAPHICS_INCLUDE_DIRS}
 	${RBDL_INCLUDE_DIR}
 	)
 
-# Create the library
-ADD_LIBRARY (sai2-common STATIC
-	${URDF_SOURCE}
-	${PARSER_SOURCE}
-	${SIMULATION_SOURCE}
-	${GRAPHICS_SOURCE}
-	${MODEL_SOURCE}
-	)
+# Create the library. TODO: add this once there is some .cpp source in the project
+# ADD_LIBRARY (sai2-common STATIC)
 
-FIND_LIBRARY(TINYXML_LIBRARIES tinyxml2)
-FIND_LIBRARY(RBDL_LIBRARIES rbdl)
-FIND_LIBRARY(RBDL_URDFREADER_LIBRARIES rbdl_urdfreader)
-SET (SAI2-COMMON_LIBRARIES sai2-common 
-	${TINYXML_LIBRARIES}
+SET (SAI2-COMMON_LIBRARIES #sai2-common 
 	${CHAI3D_LIBRARIES}
+	${SAI2-URDF_LIBRARIES}
 	${SAI2-SIMULATION_LIBRARIES}
-	${RBDL_LIBRARIES} ${RBDL_URDFREADER_LIBRARIES}
-	${KukaLBRDynamics_LIBRARIES}
+	${SAI2-MODEL_LIBRARIES}
+	${SAI2-GRAPHICS_LIBRARIES}
 	)
 
 # 
@@ -124,7 +79,7 @@ SET (SAI2-COMMON_LIBRARIES sai2-common
 # 
 
 # export package for use from the build tree
-EXPORT (TARGETS sai2-common FILE ${PROJECT_BINARY_DIR}/SAI2-COMMONTargets.cmake)
+# EXPORT (TARGETS sai2-common FILE ${PROJECT_BINARY_DIR}/SAI2-COMMONTargets.cmake)
 EXPORT (PACKAGE SAI2-COMMON)
 
 # configure package

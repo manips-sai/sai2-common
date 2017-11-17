@@ -1,10 +1,10 @@
 // This example application loads a URDF world file and simulates two robots
-// with physics and contact in a Dynamics3D virtual world. A graphics model of it is also shown using 
+// with physics and contact in a Sai2Simulation virtual world. A graphics model of it is also shown using 
 // Chai3D.
 
-#include "model/ModelInterface.h"
-#include "simulation/SimulationInterface.h"
-#include "graphics/GraphicsInterface.h"
+#include <Sai2Model.h>
+#include <Sai2Simulation.h>
+#include <Sai2Graphics.h>
 
 #include <GLFW/glfw3.h> //must be loaded after loading opengl/glew
 
@@ -29,14 +29,14 @@ int main() {
 	cout << "Loading URDF world model file: " << world_file << endl;
 
 	// load simulation world
-	auto sim = new Simulation::SimulationInterface(world_file, Simulation::sai2simulation, Simulation::urdf, false);
+	auto sim = new Simulation::Sai2Simulation(world_file, false);
 
 	// load graphics scene
-	auto graphics = new Graphics::GraphicsInterface(world_file, Graphics::chai, Graphics::urdf, true);
+	auto graphics = new Sai2Graphics::Sai2Graphics(world_file, true);
 
 	// load robots
-	auto robot1 = new Model::ModelInterface(robot_file, Model::rbdl, Model::urdf, false);
-	auto robot2 = new Model::ModelInterface(robot_file, Model::rbdl, Model::urdf, false);
+	auto robot1 = new Sai2Model::Sai2Model(robot_file, false);
+	auto robot2 = new Sai2Model::Sai2Model(robot_file, false);
 
 	// offset a joint initial condition
 	sim->getJointPositions(robot_name1, robot1->_q);

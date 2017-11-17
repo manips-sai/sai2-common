@@ -1,11 +1,10 @@
 // This example application loads a URDF world file and simulates two robots
-// with physics and contact in a Dynamics3D virtual world. A graphics model of it is also shown using 
+// with physics and contact in a Sai2Simulation virtual world. A graphics model of it is also shown using 
 // Chai3D.
 
-#include "model/ModelInterface.h"
-#include "simulation/SimulationInterface.h"
-#include "simulation/Sai2Simulation.h"
-#include "graphics/GraphicsInterface.h"
+#include <Sai2Model.h>
+#include <Sai2Simulation.h>
+#include <Sai2Graphics.h>
 #include "force_sensor/ForceSensorSim.h"
 #include "force_sensor/ForceSensorDisplay.h"
 
@@ -34,14 +33,13 @@ int main() {
 	cout << "Loading URDF world model file: " << world_file << endl;
 
 	// load simulation world
-	auto sim = new Simulation::Sai2Simulation(world_file, Simulation::urdf, false);
+	auto sim = new Simulation::Sai2Simulation(world_file, false);
 
 	// load graphics scene
-	// auto graphics = new Graphics::GraphicsInterface(world_file, Graphics::chai, Graphics::urdf, true);
-	auto graphics = new Graphics::ChaiGraphics(world_file, Graphics::urdf, true);
+	auto graphics = new Sai2Graphics::Sai2Graphics(world_file, true);
 
 	// load robots
-	auto robot1 = new Model::ModelInterface(robot_file, Model::rbdl, Model::urdf, false);
+	auto robot1 = new Sai2Model::Sai2Model(robot_file, false);
 
 	// create force sensor
 	ForceSensorSim* force_sensor = new ForceSensorSim(robot_name1, "link0", Eigen::Affine3d::Identity(), robot1);
