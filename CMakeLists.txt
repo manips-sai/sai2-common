@@ -5,9 +5,6 @@ SET (PROJECT_VERSION 0.1.0) #major version is zero for now since api will certai
 
 SET(CMAKE_CXX_FLAGS "-std=c++11 -I/usr/include -I/usr/local/include")
 
-# use KUKA proprietary dynamics library to compute the model class KukaRBDLModel. Default is OFF
-option(USE_KUKA_LBR_DYNAMICS "USE_KUKA_LBR_DYNAMICS" OFF)
-
 # set default build to release with debug info. mimic'ed from RBDL project.
 IF(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 	MESSAGE(STATUS "Setting build type to 'RelWithDebInfo' as none was specified.")
@@ -16,7 +13,7 @@ IF(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 	SET_PROPERTY(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
 ENDIF()
 
-# include Chai3d (required by Dynamics3D)
+# include Chai3d 
 # -- this is required by Chai3d to pick the correct path for OpenGL headers
 FIND_PACKAGE(CHAI3D REQUIRED)
 ADD_DEFINITIONS(${CHAI3D_DEFINITIONS})
@@ -42,19 +39,19 @@ FIND_PACKAGE(SAI2-GRAPHICS REQUIRED)
 # include Eigen
 FIND_PACKAGE(Eigen3 REQUIRED)
 
-# include RBDL
+# # include RBDL
 FIND_PACKAGE(RBDL QUIET)
-if(NOT RBDL_FOUND)
-	# --- if RBDL is not installed globally, assumes it is in sai2/3rdParty/rbdl
-	set(RBDL_LOCAL_DIR ../3rdParty/rbdl)
-	set(RBDL_INCLUDE_DIR ${RBDL_LOCAL_DIR}/include ${RBDL_LOCAL_DIR}/build/include ${RBDL_LOCAL_DIR}/addons)
-endif()
+# if(NOT RBDL_FOUND)
+# 	# --- if RBDL is not installed globally, assumes it is in sai2/3rdParty/rbdl
+# 	set(RBDL_LOCAL_DIR ../3rdParty/rbdl)
+# 	set(RBDL_INCLUDE_DIR ${RBDL_LOCAL_DIR}/include ${RBDL_LOCAL_DIR}/build/include ${RBDL_LOCAL_DIR}/addons)
+# endif()
 
 SET (SAI2-COMMON_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/src)
 
 # include Force Sensor
-SET(FORCE_SENSOR_SOURCE ${PROJECT_SOURCE_DIR}/src/force_sensor/ForceSensorSim.h
-	${PROJECT_SOURCE_DIR}/src/force_sensor/ForceSensorDisplay.h)
+SET(FORCE_SENSOR_SOURCE ${PROJECT_SOURCE_DIR}/src/force_sensor/ForceSensorSim.cpp
+	${PROJECT_SOURCE_DIR}/src/force_sensor/ForceSensorDisplay.cpp)
 
 # include Redis
 SET(REDIS_SOURCE ${PROJECT_SOURCE_DIR}/src/redis/RedisClient.cpp)
@@ -65,7 +62,7 @@ SET(TIMER_SOURCE ${PROJECT_SOURCE_DIR}/src/timer/LoopTimer.cpp)
 # Add the include directory to the include paths
 INCLUDE_DIRECTORIES (
 	${PROJECT_SOURCE_DIR}/src
-	${CHAI3D_INCLUDE_DIRS}
+	# ${CHAI3D_INCLUDE_DIRS}
 	${EIGEN3_INCLUDE_DIR}
 	${SAI2-URDF_INCLUDE_DIRS}
 	${SAI2-SIMULATION_INCLUDE_DIRS}
@@ -73,6 +70,9 @@ INCLUDE_DIRECTORIES (
 	${SAI2-GRAPHICS_INCLUDE_DIRS}
 	${RBDL_INCLUDE_DIR}
 	)
+
+message("\n\n${CHAI3D_INCLUDE_DIRS}\n\n")
+
 
 # Create the library. TODO: add this once there is some .cpp source in the project
 ADD_LIBRARY (sai2-common STATIC
@@ -89,12 +89,14 @@ SET (SAI2-COMMON_LIBRARIES #sai2-common
 	${SAI2-GRAPHICS_LIBRARIES}
 	)
 
+message("\n\n${CHAI3D_LIBRARIES}\n\n")
+
 # 
 # export package
 # 
 
 # export package for use from the build tree
-# EXPORT (TARGETS sai2-common FILE ${PROJECT_BINARY_DIR}/SAI2-COMMONTargets.cmake)
+EXPORT (TARGETS sai2-common FILE ${PROJECT_BINARY_DIR}/SAI2-COMMONTargets.cmake)
 EXPORT (PACKAGE SAI2-COMMON)
 
 # configure package
