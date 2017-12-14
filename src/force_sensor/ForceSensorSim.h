@@ -3,8 +3,8 @@
 #ifndef FORCE_SENSOR_SIM_H
 #define FORCE_SENSOR_SIM_H
 
-#include "model/ModelInterface.h"
-#include "simulation/Sai2Simulation.h"
+#include <Sai2Model.h>
+#include <Sai2Simulation.h>
 #include <Eigen/Dense>
 #include <string>
 #include <vector>
@@ -48,7 +48,7 @@ public:
 		const std::string& robot_name,
 		const std::string& link_name,
 		const Eigen::Affine3d& transform_in_link,
-		Model::ModelInterface* model)
+		Sai2Model::Sai2Model* model)
 	:	_model(model)
 	{
 		_data = new ForceSensorData();
@@ -105,7 +105,7 @@ public:
 
 public:
 	// handle to model interface
-	Model::ModelInterface* _model;
+	Sai2Model::Sai2Model* _model;
 
 	// last updated data
 	ForceSensorData* _data;

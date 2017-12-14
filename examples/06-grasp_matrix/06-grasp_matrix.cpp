@@ -1,7 +1,7 @@
 // This tests the grasp matrix function of sai2 model interface.
 
-#include "model/ModelInterface.h"
-#include "graphics/ChaiGraphics.h"
+#include <Sai2Model.h>
+#include <Sai2Graphics.h>
 
 #include <GLFW/glfw3.h> //must be loaded after loading opengl/glew
 
@@ -35,12 +35,12 @@ int main() {
 	cout << "Loading URDF world model file: " << world_file << endl;
 
 	// load graphics scene
-	auto graphics = new Graphics::ChaiGraphics(world_file, Graphics::urdf, true);
+	auto graphics = new Sai2Graphics::Sai2Graphics(world_file, true);
 	Eigen::Vector3d camera_pos, camera_lookat, camera_vertical;
 	graphics->getCameraPose(camera_name, camera_pos, camera_vertical, camera_lookat);
 
 	// load robot
-	auto linkage = new Model::ModelInterface(robot_file, Model::rbdl, Model::urdf, false);
+	auto linkage = new Sai2Model::Sai2Model(robot_file, false);
 
 	// Make perfect tetrahedron
 	linkage->_q << 54.7356 /180.0*M_PI, 54.7356 /180.0*M_PI, 54.7356 /180.0*M_PI;
@@ -95,9 +95,9 @@ int main() {
 	pos_in_links.push_back(Eigen::Vector3d(1,0,0));
 	pos_in_links.push_back(Eigen::Vector3d(1,0,0));
 
-	vector<Model::ContactNature> contact_natures;
-	contact_natures.push_back(Model::SurfaceContact);
-	contact_natures.push_back(Model::PointContact);
+	vector<Sai2Model::ContactNature> contact_natures;
+	contact_natures.push_back(Sai2Model::SurfaceContact);
+	contact_natures.push_back(Sai2Model::PointContact);
 	
 	// for 2 contact points. the grasp matrix is given in the local frame of the virtual linkage
 	// More precisely, given the external forces and moments in world frame, we get
@@ -128,9 +128,9 @@ int main() {
 	pos_in_links.push_back(Eigen::Vector3d(1,0,0));
 
 	contact_natures.clear();
-	contact_natures.push_back(Model::SurfaceContact);
-	contact_natures.push_back(Model::PointContact);
-	contact_natures.push_back(Model::PointContact);
+	contact_natures.push_back(Sai2Model::SurfaceContact);
+	contact_natures.push_back(Sai2Model::PointContact);
+	contact_natures.push_back(Sai2Model::PointContact);
 
 	// for 3 contact points, everything is given in world frame.
 	// the tensions are in the order 1-2, 1-3, 2-3.

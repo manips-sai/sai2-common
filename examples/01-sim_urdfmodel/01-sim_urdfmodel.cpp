@@ -1,7 +1,7 @@
 // This example application loads a simple robot from a URDF file and simulates
-// its physics in a Dynamics3D virtual world.
+// its physics in a Sai2Simulation virtual world.
 
-#include "simulation/SimulationInterface.h"
+#include <Sai2Simulation.h>
 
 #include <iostream>
 #include <string>
@@ -15,7 +15,7 @@ const vector<string> robot_names = {"PBot1", "PBot2"};
 int main() {
 	cout << "Loading URDF world model file: " << world_file << endl;
 
-	auto sim = new Simulation::SimulationInterface(world_file, Simulation::sai2simulation, Simulation::urdf, true);
+	auto sim = new Simulation::Sai2Simulation(world_file, true);
 
 	// integrate
 	Eigen::VectorXd q(sim->dof(robot_names[0]));

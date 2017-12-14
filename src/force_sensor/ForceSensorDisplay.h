@@ -2,13 +2,13 @@
 #define FORCE_SENSOR_DISPLAY_H
 
 #include "ForceSensorSim.h"
-#include <graphics/ChaiGraphics.h>
+#include <Sai2Graphics.h>
 #include <chai3d.h>
 
 // Class to display force and moments sensed by a force/moment sensor
 class ForceSensorDisplay {
 public:
-	ForceSensorDisplay(ForceSensorSim* sensor_sim, Graphics::ChaiGraphics* graphics)
+	ForceSensorDisplay(ForceSensorSim* sensor_sim, Sai2Graphics::Sai2Graphics* graphics)
 	: _sensor_sim(sensor_sim), _graphics(graphics)
 	{
 		// initialize display lines
@@ -64,7 +64,7 @@ public:
 	ForceSensorSim* _sensor_sim;
 
 	// handle to graphics interface to query interaction state change
-	Graphics::ChaiGraphics* _graphics;
+	Sai2Graphics::Sai2Graphics* _graphics;
 };
 
 #endif //FORCE_SENSOR_DISPLAY_H

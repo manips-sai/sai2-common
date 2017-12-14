@@ -1,8 +1,7 @@
 // This example application loads a simple robot from a URDF file and simulates
-// its physics in a Dynamics3D virtual world.
+// its physics in a Sai2Simulation virtual world.
 
-#include "simulation/SimulationInterface.h"
-#include "model/RBDLModel.h"
+#include <Sai2Model.h>
 
 #include <iostream>
 #include <string>
@@ -21,7 +20,7 @@ int main() {
 	Eigen::Vector3d CoM;
 	Eigen::Matrix3d inertia;
 
-	auto model = new Model::RBDLModel(robot_file, Model::urdf, true);
+	auto model = new Sai2Model::Sai2Model(robot_file, true);
 
 	model->getLinkMass(mass, CoM, inertia, "link0");
 
