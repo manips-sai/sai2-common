@@ -39,14 +39,6 @@ FIND_PACKAGE(SAI2-GRAPHICS REQUIRED)
 # include Eigen
 FIND_PACKAGE(Eigen3 REQUIRED)
 
-# # include RBDL
-FIND_PACKAGE(RBDL QUIET)
-# if(NOT RBDL_FOUND)
-# 	# --- if RBDL is not installed globally, assumes it is in sai2/3rdParty/rbdl
-# 	set(RBDL_LOCAL_DIR ../3rdParty/rbdl)
-# 	set(RBDL_INCLUDE_DIR ${RBDL_LOCAL_DIR}/include ${RBDL_LOCAL_DIR}/build/include ${RBDL_LOCAL_DIR}/addons)
-# endif()
-
 SET (SAI2-COMMON_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/src)
 
 # include Force Sensor
@@ -62,7 +54,7 @@ SET(TIMER_SOURCE ${PROJECT_SOURCE_DIR}/src/timer/LoopTimer.cpp)
 # Add the include directory to the include paths
 INCLUDE_DIRECTORIES (
 	${PROJECT_SOURCE_DIR}/src
-	# ${CHAI3D_INCLUDE_DIRS}
+	${CHAI3D_INCLUDE_DIRS}
 	${EIGEN3_INCLUDE_DIR}
 	${SAI2-URDF_INCLUDE_DIRS}
 	${SAI2-SIMULATION_INCLUDE_DIRS}
@@ -70,9 +62,6 @@ INCLUDE_DIRECTORIES (
 	${SAI2-GRAPHICS_INCLUDE_DIRS}
 	${RBDL_INCLUDE_DIR}
 	)
-
-message("\n\n${CHAI3D_INCLUDE_DIRS}\n\n")
-
 
 # Create the library. TODO: add this once there is some .cpp source in the project
 ADD_LIBRARY (sai2-common STATIC
@@ -88,8 +77,6 @@ SET (SAI2-COMMON_LIBRARIES #sai2-common
 	${SAI2-MODEL_LIBRARIES}
 	${SAI2-GRAPHICS_LIBRARIES}
 	)
-
-message("\n\n${CHAI3D_LIBRARIES}\n\n")
 
 # 
 # export package
