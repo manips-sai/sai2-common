@@ -6,6 +6,8 @@ SET (PROJECT_VERSION 0.1.0) #major version is zero for now since api will certai
 SET(CMAKE_CXX_STANDARD 11)
 include_directories(/usr/include /usr/local/include)
 
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
 # set default build to release with debug info. mimic'ed from RBDL project.
 IF(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 	MESSAGE(STATUS "Setting build type to 'RelWithDebInfo' as none was specified.")
@@ -114,14 +116,18 @@ INCLUDE_DIRECTORIES (
 	${SAI2-COMMON_INCLUDE_DIRS}
 	${URDF_INCLUDE_DIR}
 )
-
+file(GLOB SAI2-COMMON_SOURCE
+	${PROJECT_SOURCE_DIR}/src/graphics/*.cpp
+	${PROJECT_SOURCE_DIR}/src/model/*.cpp
+	${PROJECT_SOURCE_DIR}/src/parser/*.cpp
+	${PROJECT_SOURCE_DIR}/src/redis/*.cpp
+	${PROJECT_SOURCE_DIR}/src/simulation/*.cpp
+	${PROJECT_SOURCE_DIR}/src/timer/*.cpp
+)
 # Create the library
-ADD_LIBRARY (sai2-common-source STATIC
+ADD_LIBRARY (sai2-common-source STATIC   
 	${URDF_SOURCE}
-	${PARSER_SOURCE}
-	${SIMULATION_SOURCE}
-	${GRAPHICS_SOURCE}
-	${MODEL_SOURCE}
+	${SAI2-COMMON_SOURCE}
 )
 
 FIND_LIBRARY(TINYXML_LIBRARIES tinyxml2)
