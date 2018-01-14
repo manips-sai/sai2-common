@@ -178,11 +178,25 @@ bool ChaiGraphics::getRobotLinkInCamera(const std::string& camera_name,
 			return false;
 		}
 		auto object_parent = object->getParent();
+		bool f_found_parent_link = false;
+		cTransform transform = object->getLocalTransform();
+		cRobotLink* link;
 		while (object_parent != NULL) {
 			if (robot_name == object_parent->m_name) {
-				ret_link_name = object->getParent()->m_name;
-				ret_pos << pos.x(), pos.y(), pos.z();
 				return true;
+			}
+			if (!f_found_parent_link) {
+				// try casting to cRobotLink
+				link = dynamic_cast<cRobotLink*> (object_parent);
+				if (link != NULL) {
+					f_found_parent_link = true;
+					ret_link_name = link->m_name;
+					// position is with respect to the graphic object. need to go up to the link frame
+					pos = transform * pos;
+					ret_pos << pos.x(), pos.y(), pos.z();
+				} else {
+					transform = object_parent->getLocalTransform()*transform;
+				}
 			}
 			object_parent = object_parent->getParent();
 		}
