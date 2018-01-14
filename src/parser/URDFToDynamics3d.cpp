@@ -101,7 +101,8 @@ static void loadLinkCollision(cDynamicLink* link, const my_shared_ptr<urdf::Coll
 	tmp_mmesh->setLocalRot(tmp_cmat3);
 	link->setCollisionModel(tmp_mmesh);
 	// build collision model (currently, only convex hull and box are supported!)
-	link->buildCollisionHull(CDYN_ERROR_EPSILON, CDYN_ERROR_EPSILON);
+	// link->buildCollisionHull(CDYN_ERROR_EPSILON, CDYN_ERROR_EPSILON);
+	link->buildCollisionTriangles(CDYN_ERROR_EPSILON, CDYN_ERROR_EPSILON);
 }
 
 // load inertial properties from urdf link to dynamics3d link
