@@ -17,6 +17,10 @@ ForceSensorDisplay::ForceSensorDisplay(ForceSensorSim* sensor_sim, Sai2Graphics:
 	_display_line_moment->m_colorPointB.setBrownMaroon();
 	_graphics->_world->addChild(_display_line_moment);
 	_display_line_moment->setLineWidth(4.0);
+
+	// initialize scales
+	_force_line_scale = 1.0;
+	_moment_line_scale = 1.0;
 }
 
 void ForceSensorDisplay::update() {
@@ -24,14 +28,14 @@ void ForceSensorDisplay::update() {
 	auto robot_model = _sensor_sim->_model;
 	// get common point A
 	Eigen::Vector3d epointA;
-	robot_model->position(epointA, _sensor_sim->_data->_link_name, _sensor_sim->_data->_transform_in_link.translation());
+	robot_model->position_in_world_frame(epointA, _sensor_sim->_data->_link_name, _sensor_sim->_data->_transform_in_link.translation());
 
 	// force:
 	_display_line_force->m_pointA = chai3d::cVector3d(epointA);
 	// get point B
 	Eigen::Vector3d sensor_force;
 	_sensor_sim->getForce(sensor_force);
-	_display_line_force->m_pointB = chai3d::cVector3d(epointA + sensor_force*0.02); //100 to 1 scale down in length
+	_display_line_force->m_pointB = chai3d::cVector3d(epointA + sensor_force*0.02*_force_line_scale); //100 to 1 scale down in length
 	// set show true
 	_display_line_force->setShowEnabled(true);
 
@@ -40,7 +44,7 @@ void ForceSensorDisplay::update() {
 	// get point B
 	Eigen::Vector3d sensor_moment;
 	_sensor_sim->getMoment(sensor_moment);
-	_display_line_moment->m_pointB = chai3d::cVector3d(epointA + sensor_moment*0.1); //100 to 1 scale down in length
+	_display_line_moment->m_pointB = chai3d::cVector3d(epointA + sensor_moment*0.1*_moment_line_scale); //100 to 1 scale down in length
 	// set show true
 	_display_line_moment->setShowEnabled(true);
 }

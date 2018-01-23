@@ -24,6 +24,13 @@ public:
 
 	// handle to graphics interface to query interaction state change
 	Sai2Graphics::Sai2Graphics* _graphics;
+
+	// scale of the force line displayed from 0 to 1
+	double _force_line_scale;
+
+	// scale of the moment line displayed from 0 to 1
+	double _moment_line_scale;
+
 };
 
 #endif //FORCE_SENSOR_DISPLAY_H
