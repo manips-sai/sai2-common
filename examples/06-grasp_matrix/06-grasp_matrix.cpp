@@ -107,7 +107,7 @@ int main() {
 	// the support forces and moments in local frame, as well as the internal moments along the y and z axis in local frame
 	// The local frame is described by the matrix R
 	// linkage->GraspMatrixAtGeometricCenter(G, R, center_point, link_names, pos_in_links, contact_natures);
-	linkage->GraspMatrixAtGeometricCenter(G, R, center_point);
+	linkage->graspMatrixAtGeometricCenter(G, R, center_point);
 	// G.block<3,9>(0,0) = R*G.block<3,9>(0,0);
 	// G.block<3,9>(3,0) = R*G.block<3,9>(3,0);
 
@@ -140,7 +140,7 @@ int main() {
 
 	// for 3 contact points, everything is given in world frame.
 	// the tensions are in the order 1-2, 1-3, 2-3.
-	linkage->GraspMatrixAtGeometricCenter(G, R, center_point);
+	linkage->graspMatrixAtGeometricCenter(G, R, center_point);
 	
 	cout << "--------------------------------------------" << endl;
 	cout << "                  3 contacts                " << endl;
