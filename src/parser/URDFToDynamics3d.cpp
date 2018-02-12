@@ -236,6 +236,8 @@ void URDFToDynamics3dWorld(const std::string& filename, cDynamicWorld* world, bo
 			tmp_cmat3);
 		assert(object);
 		object->m_name = object_ptr->name;
+		object->setLocalPos(tmp_cvec3);
+		object->setLocalRot(tmp_cmat3);
 
 		// add a link for collision
 		auto default_mat = new cDynamicMaterial();
