@@ -8,6 +8,7 @@
 #include <Eigen/Dense>
 #include <string>
 #include <vector>
+#include "filters/ButterworthFilter.h"
 
 // Basic data structure for force sensor data
 struct ForceSensorData {
@@ -62,12 +63,20 @@ public:
 	// get moment
 	void getMoment(Eigen::Vector3d& ret_moment);
 
+	void enableFilter(const double fc);
+
 public:
 	// handle to model interface
 	Sai2Model::Sai2Model* _model;
 
 	// last updated data
 	ForceSensorData* _data;
+
+	// filter
+	ButterworthFilter* _force_filter;
+	ButterworthFilter* _moment_filter;
+	bool _filter_on;
+
 };
 
 #endif //FORCE_SENSOR_SIM_H

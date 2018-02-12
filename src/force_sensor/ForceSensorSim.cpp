@@ -12,6 +12,10 @@ ForceSensorSim::ForceSensorSim(
 	_data->_robot_name = robot_name;
 	_data->_link_name = link_name;
 	_data->_transform_in_link = transform_in_link;
+
+	_force_filter = new ButterworthFilter(3);
+	_moment_filter = new ButterworthFilter(3);
+	_filter_on = false;
 }
 
 //dtor
@@ -46,8 +50,20 @@ void ForceSensorSim::update(Simulation::Sai2Simulation* sim) {
 		//unfortunately, it is defined in global frame
 		_data->_moment += rel_pos.cross(force_list[pt_ind]);
 	}
-	_data->_force = _data->_transform_in_link.inverse().rotation()*_data->_force;
-	_data->_moment = _data->_transform_in_link.inverse().rotation()*_data->_moment;
+
+	Eigen::VectorXd force_raw = _data->_transform_in_link.inverse().rotation()*_data->_force;
+	Eigen::VectorXd moment_raw = _data->_transform_in_link.inverse().rotation()*_data->_moment;
+
+	if(_filter_on)
+	{
+		_data->_force = _force_filter->update(force_raw);
+		_data->_moment = _moment_filter->update(moment_raw);
+	}
+	else
+	{
+		_data->_force = force_raw;
+		_data->_moment = moment_raw;
+	}
 }
 
 // get force
@@ -59,3 +75,11 @@ void ForceSensorSim::getForce(Eigen::Vector3d& ret_force) {
 void ForceSensorSim::getMoment(Eigen::Vector3d& ret_moment) {
 	ret_moment = _data->_moment;
 }
+
+void ForceSensorSim::enableFilter(const double fc)
+{
+	_filter_on = true;
+	_force_filter->setCutoffFrequency(fc);
+	_moment_filter->setCutoffFrequency(fc);
+}
+
