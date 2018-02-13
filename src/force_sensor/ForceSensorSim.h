@@ -60,8 +60,14 @@ public:
 	// get force
 	void getForce(Eigen::Vector3d& ret_force);
 
+	// get force in local sensor frame
+	void getForceLocalFrame(Eigen::Vector3d& ret_force);
+
 	// get moment
 	void getMoment(Eigen::Vector3d& ret_moment);
+
+	// get moment in local sensor frame
+	void getMomentLocalFrame(Eigen::Vector3d& ret_moment);
 
 	void enableFilter(const double fc);
 

@@ -71,9 +71,23 @@ void ForceSensorSim::getForce(Eigen::Vector3d& ret_force) {
 	ret_force = _data->_force;
 }
 
+void ForceSensorSim::getForceLocalFrame(Eigen::Vector3d& ret_force) {
+	Eigen::Matrix3d R_base_link;
+	_model->rotation(R_base_link, _data->_link_name);
+
+	ret_force = R_base_link * (_data->_transform_in_link.rotation() * _data->_force);
+}
+
 // get moment
 void ForceSensorSim::getMoment(Eigen::Vector3d& ret_moment) {
 	ret_moment = _data->_moment;
+}
+
+void ForceSensorSim::getMomentLocalFrame(Eigen::Vector3d& ret_moment) {
+	Eigen::Matrix3d R_base_link;
+	_model->rotation(R_base_link, _data->_link_name);
+
+	ret_moment = R_base_link * (_data->_transform_in_link.rotation() * _data->_moment);
 }
 
 void ForceSensorSim::enableFilter(const double fc)
