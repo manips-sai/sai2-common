@@ -41,7 +41,6 @@ public:
 // Note also that this assumes the force sensor to be located just between the
 // link and the end-effector. That is, it cannot account for any joint reaction
 // forces in case the sensor is to be attached on the link between two joints.
-// Finally note that the sensor returns values in the global frame
 class ForceSensorSim {
 public:
 	// ctor
@@ -57,13 +56,13 @@ public:
 	// update force information
 	void update(Simulation::Sai2Simulation* sim);
 
-	// get force
+	// get force in world coordinates
 	void getForce(Eigen::Vector3d& ret_force);
 
 	// get force in local sensor frame
 	void getForceLocalFrame(Eigen::Vector3d& ret_force);
 
-	// get moment
+	// get moment in world coordinates
 	void getMoment(Eigen::Vector3d& ret_moment);
 
 	// get moment in local sensor frame

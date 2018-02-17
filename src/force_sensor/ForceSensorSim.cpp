@@ -43,7 +43,7 @@ void ForceSensorSim::update(Simulation::Sai2Simulation* sim) {
 	// transform to sensor frame
 	Eigen::Vector3d rel_pos;
 	Eigen::Vector3d link_pos;
-	_model->position(link_pos, _data->_link_name, _data->_transform_in_link.translation());
+	_model->positionInWorld(link_pos, _data->_link_name, _data->_transform_in_link.translation());
 	for (uint pt_ind=0; pt_ind < point_list.size(); ++pt_ind) {
 		_data->_force += force_list[pt_ind];
 		rel_pos = point_list[pt_ind] - link_pos;
@@ -51,8 +51,8 @@ void ForceSensorSim::update(Simulation::Sai2Simulation* sim) {
 		_data->_moment += rel_pos.cross(force_list[pt_ind]);
 	}
 
-	Eigen::VectorXd force_raw = _data->_transform_in_link.inverse().rotation()*_data->_force;
-	Eigen::VectorXd moment_raw = _data->_transform_in_link.inverse().rotation()*_data->_moment;
+	Eigen::VectorXd force_raw = _data->_force;
+	Eigen::VectorXd moment_raw = _data->_moment;
 
 	if(_filter_on)
 	{
@@ -72,10 +72,11 @@ void ForceSensorSim::getForce(Eigen::Vector3d& ret_force) {
 }
 
 void ForceSensorSim::getForceLocalFrame(Eigen::Vector3d& ret_force) {
-	Eigen::Matrix3d R_base_link;
-	_model->rotation(R_base_link, _data->_link_name);
+	Eigen::Matrix3d R_base_sensor;
+	_model->rotationInWorld(R_base_sensor, _data->_link_name);
+	R_base_sensor = R_base_sensor * _data->_transform_in_link.rotation();
 
-	ret_force = R_base_link * (_data->_transform_in_link.rotation() * _data->_force);
+	ret_force = R_base_sensor.transpose() * _data->_force;
 }
 
 // get moment
@@ -84,10 +85,11 @@ void ForceSensorSim::getMoment(Eigen::Vector3d& ret_moment) {
 }
 
 void ForceSensorSim::getMomentLocalFrame(Eigen::Vector3d& ret_moment) {
-	Eigen::Matrix3d R_base_link;
-	_model->rotation(R_base_link, _data->_link_name);
+	Eigen::Matrix3d R_base_sensor;
+	_model->rotationInWorld(R_base_sensor, _data->_link_name);
+	R_base_sensor = R_base_sensor * _data->_transform_in_link.rotation();
 
-	ret_moment = R_base_link * (_data->_transform_in_link.rotation() * _data->_moment);
+	ret_moment = R_base_sensor.transpose() * _data->_moment;
 }
 
 void ForceSensorSim::enableFilter(const double fc)
