@@ -56,16 +56,16 @@ public:
 	// update force information
 	void update(Simulation::Sai2Simulation* sim);
 
-	// get force in world coordinates
+	// get force applied to sensor body in world coordinates
 	void getForce(Eigen::Vector3d& ret_force);
 
-	// get force in local sensor frame
+	// get force applied to sensor body in local sensor frame
 	void getForceLocalFrame(Eigen::Vector3d& ret_force);
 
-	// get moment in world coordinates
+	// get moment applied to sensor body in world coordinates
 	void getMoment(Eigen::Vector3d& ret_moment);
 
-	// get moment in local sensor frame
+	// get moment applied to sensor body in local sensor frame
 	void getMomentLocalFrame(Eigen::Vector3d& ret_moment);
 
 	void enableFilter(const double fc);
