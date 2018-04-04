@@ -8,6 +8,7 @@
 #include <Eigen/Dense>
 #include <string>
 #include <vector>
+#include "filters/ButterworthFilter.h"
 
 // Basic data structure for force sensor data
 struct ForceSensorData {
@@ -40,7 +41,6 @@ public:
 // Note also that this assumes the force sensor to be located just between the
 // link and the end-effector. That is, it cannot account for any joint reaction
 // forces in case the sensor is to be attached on the link between two joints.
-// Finally note that the sensor returns values in the global frame
 class ForceSensorSim {
 public:
 	// ctor
@@ -56,11 +56,19 @@ public:
 	// update force information
 	void update(Simulation::Sai2Simulation* sim);
 
-	// get force
+	// get force applied to sensor body in world coordinates
 	void getForce(Eigen::Vector3d& ret_force);
 
-	// get moment
+	// get force applied to sensor body in local sensor frame
+	void getForceLocalFrame(Eigen::Vector3d& ret_force);
+
+	// get moment applied to sensor body in world coordinates
 	void getMoment(Eigen::Vector3d& ret_moment);
+
+	// get moment applied to sensor body in local sensor frame
+	void getMomentLocalFrame(Eigen::Vector3d& ret_moment);
+
+	void enableFilter(const double fc);
 
 public:
 	// handle to model interface
@@ -68,6 +76,12 @@ public:
 
 	// last updated data
 	ForceSensorData* _data;
+
+	// filter
+	ButterworthFilter* _force_filter;
+	ButterworthFilter* _moment_filter;
+	bool _filter_on;
+
 };
 
 #endif //FORCE_SENSOR_SIM_H

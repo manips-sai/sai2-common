@@ -62,6 +62,9 @@ SET(REDIS_SOURCE ${PROJECT_SOURCE_DIR}/src/redis/RedisClient.cpp)
 # include Timer
 SET(TIMER_SOURCE ${PROJECT_SOURCE_DIR}/src/timer/LoopTimer.cpp)
 
+# include filter
+SET(FILTER_SOURCE ${PROJECT_SOURCE_DIR}/src/filters/ButterworthFilter.cpp)
+
 # Add the include directory to the include paths
 INCLUDE_DIRECTORIES (
 	${PROJECT_SOURCE_DIR}/src
@@ -79,6 +82,7 @@ ADD_LIBRARY (sai2-common STATIC
 	${FORCE_SENSOR_SOURCE}
 	${REDIS_SOURCE}
 	${TIMER_SOURCE}
+	${FILTER_SOURCE}
 	)
 
 SET (SAI2-COMMON_LIBRARIES sai2-common 
