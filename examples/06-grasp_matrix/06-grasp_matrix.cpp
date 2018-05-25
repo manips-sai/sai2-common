@@ -99,15 +99,15 @@ int main() {
 	// contact_natures.push_back(Sai2Model::SurfaceContact);
 	// contact_natures.push_back(Sai2Model::PointContact);
 
-	linkage->addContact("link0", Eigen::Vector3d(1,0,0), 2);
-	linkage->addContact("link1", Eigen::Vector3d(1,0,0), 0);
+	linkage->addEnvironmentalContact("link0", Eigen::Vector3d(1,0,0), 2);
+	linkage->addEnvironmentalContact("link1", Eigen::Vector3d(1,0,0), 0);
 	
 	// for 2 contact points. the grasp matrix is given in the local frame of the virtual linkage
 	// More precisely, given the external forces and moments in world frame, we get
 	// the support forces and moments in local frame, as well as the internal moments along the y and z axis in local frame
 	// The local frame is described by the matrix R
-	// linkage->GraspMatrixAtGeometricCenter(G, R, center_point, link_names, pos_in_links, contact_natures);
-	linkage->graspMatrixAtGeometricCenter(G, R, center_point);
+	// linkage->environmentalGraspMatrixAtGeometricCenter(G, R, center_point, link_names, pos_in_links, contact_natures);
+	linkage->environmentalGraspMatrixAtGeometricCenter(G, R, center_point);
 	// G.block<3,9>(0,0) = R*G.block<3,9>(0,0);
 	// G.block<3,9>(3,0) = R*G.block<3,9>(3,0);
 
@@ -136,11 +136,11 @@ int main() {
 	// contact_natures.push_back(Sai2Model::PointContact);
 	// contact_natures.push_back(Sai2Model::PointContact);
 
-	linkage->addContact("link2", Eigen::Vector3d(1,0,0));
+	linkage->addEnvironmentalContact("link2", Eigen::Vector3d(1,0,0));
 
 	// for 3 contact points, everything is given in world frame.
 	// the tensions are in the order 1-2, 1-3, 2-3.
-	linkage->graspMatrixAtGeometricCenter(G, R, center_point);
+	linkage->environmentalGraspMatrixAtGeometricCenter(G, R, center_point);
 	
 	cout << "--------------------------------------------" << endl;
 	cout << "                  3 contacts                " << endl;
