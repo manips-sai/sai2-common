@@ -28,7 +28,7 @@ void ForceSensorDisplay::update() {
 	auto robot_model = _sensor_sim->_model;
 	// get common point A
 	Eigen::Vector3d epointA;
-	robot_model->position_in_world_frame(epointA, _sensor_sim->_data->_link_name, _sensor_sim->_data->_transform_in_link.translation());
+	robot_model->positionInWorld(epointA, _sensor_sim->_data->_link_name, _sensor_sim->_data->_transform_in_link.translation());
 
 	// force:
 	_display_line_force->m_pointA = chai3d::cVector3d(epointA);

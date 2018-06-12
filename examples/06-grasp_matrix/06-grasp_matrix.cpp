@@ -87,23 +87,27 @@ int main() {
 	//----------------------------------------
 	// test dual contact case with surface contact at one side and point at the other
 	//----------------------------------------
-	vector<string> link_names;
-	link_names.push_back("link0");
-	link_names.push_back("link1");
+	// vector<string> link_names;
+	// link_names.push_back("link0");
+	// link_names.push_back("link1");
 
-	vector<Eigen::Vector3d> pos_in_links;
-	pos_in_links.push_back(Eigen::Vector3d(1,0,0));
-	pos_in_links.push_back(Eigen::Vector3d(1,0,0));
+	// vector<Eigen::Vector3d> pos_in_links;
+	// pos_in_links.push_back(Eigen::Vector3d(1,0,0));
+	// pos_in_links.push_back(Eigen::Vector3d(1,0,0));
 
-	vector<Sai2Model::ContactNature> contact_natures;
-	contact_natures.push_back(Sai2Model::SurfaceContact);
-	contact_natures.push_back(Sai2Model::PointContact);
+	// vector<Sai2Model::ContactNature> contact_natures;
+	// contact_natures.push_back(Sai2Model::SurfaceContact);
+	// contact_natures.push_back(Sai2Model::PointContact);
+
+	linkage->addEnvironmentalContact("link0", Eigen::Vector3d(1,0,0), 2);
+	linkage->addEnvironmentalContact("link1", Eigen::Vector3d(1,0,0), 0);
 	
 	// for 2 contact points. the grasp matrix is given in the local frame of the virtual linkage
 	// More precisely, given the external forces and moments in world frame, we get
 	// the support forces and moments in local frame, as well as the internal moments along the y and z axis in local frame
 	// The local frame is described by the matrix R
-	linkage->GraspMatrixAtGeometricCenter(G, R, center_point, link_names, pos_in_links, contact_natures);
+	// linkage->environmentalGraspMatrixAtGeometricCenter(G, R, center_point, link_names, pos_in_links, contact_natures);
+	linkage->environmentalGraspMatrixAtGeometricCenter(G, R, center_point);
 	// G.block<3,9>(0,0) = R*G.block<3,9>(0,0);
 	// G.block<3,9>(3,0) = R*G.block<3,9>(3,0);
 
@@ -117,24 +121,26 @@ int main() {
 	//----------------------------------------
 	// test 3 contact case with one surface contact
 	//----------------------------------------
-	link_names.clear();
-	link_names.push_back("link0");
-	link_names.push_back("link1");
-	link_names.push_back("link2");
+	// link_names.clear();
+	// link_names.push_back("link0");
+	// link_names.push_back("link1");
+	// link_names.push_back("link2");
 
-	pos_in_links.clear();
-	pos_in_links.push_back(Eigen::Vector3d(1,0,0));
-	pos_in_links.push_back(Eigen::Vector3d(1,0,0));
-	pos_in_links.push_back(Eigen::Vector3d(1,0,0));
+	// pos_in_links.clear();
+	// pos_in_links.push_back(Eigen::Vector3d(1,0,0));
+	// pos_in_links.push_back(Eigen::Vector3d(1,0,0));
+	// pos_in_links.push_back(Eigen::Vector3d(1,0,0));
 
-	contact_natures.clear();
-	contact_natures.push_back(Sai2Model::SurfaceContact);
-	contact_natures.push_back(Sai2Model::PointContact);
-	contact_natures.push_back(Sai2Model::PointContact);
+	// contact_natures.clear();
+	// contact_natures.push_back(Sai2Model::SurfaceContact);
+	// contact_natures.push_back(Sai2Model::PointContact);
+	// contact_natures.push_back(Sai2Model::PointContact);
+
+	linkage->addEnvironmentalContact("link2", Eigen::Vector3d(1,0,0));
 
 	// for 3 contact points, everything is given in world frame.
 	// the tensions are in the order 1-2, 1-3, 2-3.
-	linkage->GraspMatrixAtGeometricCenter(G, R, center_point, link_names, pos_in_links, contact_natures);
+	linkage->environmentalGraspMatrixAtGeometricCenter(G, R, center_point);
 	
 	cout << "--------------------------------------------" << endl;
 	cout << "                  3 contacts                " << endl;
