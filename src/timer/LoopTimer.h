@@ -115,6 +115,7 @@ protected:
 	std::chrono::high_resolution_clock::time_point t_curr_;
 	std::chrono::high_resolution_clock::time_point t_start_;
 	std::chrono::high_resolution_clock::duration t_loop_;
+	std::chrono::high_resolution_clock::duration t_tmp_;
 	std::chrono::nanoseconds ns_update_interval_;
 #else  // USE_CHRONO
 	struct timespec t_next_;
