@@ -114,6 +114,14 @@ public:
 	void del(const std::string& key);
 
 	/**
+	 * Perform Redis command: EXISTS key.
+	 *
+	 * @param key    Key to delete in Redis.
+	 * @return       true if key exists, false otherwise.
+	 */
+	bool exists(const std::string& key);
+
+	/**
 	 * Perform Redis GET commands in bulk: GET key1; GET key2...
 	 *
 	 * Pipeget gets multiple keys as a non-atomic operation. More efficient than

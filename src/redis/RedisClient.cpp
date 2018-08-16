@@ -74,6 +74,26 @@ void RedisClient::del(const std::string& key) {
 		throw std::runtime_error("RedisClient: DEL '" + key + "' failed.");
 }
 
+bool RedisClient::exists(const std::string& key) {
+	// Call GET command
+	auto reply = command("EXISTS %s", key.c_str());
+
+	// Check for errors
+	if (!reply || reply->type == REDIS_REPLY_ERROR || reply->type == REDIS_REPLY_NIL)
+		throw std::runtime_error("RedisClient: EXISTS '" + key + "' failed.");
+	if (reply->type != REDIS_REPLY_INTEGER)
+		throw std::runtime_error("RedisClient: EXISTS '" + key + "' returned non-integer value.");
+	
+	bool return_value = (reply->integer == 1);
+
+	if (!return_value && (reply->integer != 0))
+	{
+		throw std::runtime_error("RedisClient: EXISTS '" + key + "' returned unexpected value (not 0 or 1)");
+	}
+
+	return return_value;
+}
+
 std::vector<std::string> RedisClient::pipeget(const std::vector<std::string>& keys) {
 	// Prepare key list
 	for (const auto& key : keys) {
