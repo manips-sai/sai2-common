@@ -7,6 +7,13 @@ SET(CMAKE_CXX_FLAGS "-std=c++11 -I/usr/include -I/usr/local/include")
 
 # use KUKA proprietary dynamics library to compute the model class KukaRBDLModel. Default is OFF
 option(USE_KUKA_LBR_DYNAMICS "USE_KUKA_LBR_DYNAMICS" OFF)
+option(USE_SHARED_LIBRARY "USE_SHARED_LIBRARY" OFF)
+
+
+if (USE_SHARED_LIBRARY)
+	set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+endif(USE_SHARED_LIBRARY)
+
 
 # set default build to release with debug info. mimic'ed from RBDL project.
 IF(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
@@ -15,6 +22,7 @@ IF(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 	SET(CMAKE_BUILD_TYPE RelWithDebInfo CACHE STRING "Choose the type of build." FORCE)
 	SET_PROPERTY(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
 ENDIF()
+
 
 # include Chai3d (required by Dynamics3D)
 # -- this is required by Chai3d to pick the correct path for OpenGL headers
