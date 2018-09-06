@@ -100,7 +100,11 @@ my_shared_ptr<ModelInterface>  parseURDF(const std::string &xml_string)
       else
       {
         model->materials_.insert(make_pair(material->name,material));
-        logDebug("urdfdom: successfully added a new material '%s'", material->name.c_str());
+        // 
+        #ifdef VERBOSE_PARSER
+          logDebug("urdfdom: successfully added a new material '%s'", material->name.c_str());
+        #endif
+
       }
     }
     catch (ParseError &e) {
@@ -129,21 +133,32 @@ my_shared_ptr<ModelInterface>  parseURDF(const std::string &xml_string)
       else
       {
         // set link visual material
-        logDebug("urdfdom: setting link '%s' material", link->name.c_str());
-        if (link->visual)
+        // 
+        #ifdef VERBOSE_PARSER
+          logDebug("urdfdom: setting link '%s' material", link->name.c_str());
+          #endif
+          if (link->visual)
         {
           if (!link->visual->material_name.empty())
           {
             if (model->getMaterial(link->visual->material_name))
             {
-              logDebug("urdfdom: setting link '%s' material to '%s'", link->name.c_str(),link->visual->material_name.c_str());
+              // 
+              #ifdef VERBOSE_PARSER
+                logDebug("urdfdom: setting link '%s' material to '%s'", link->name.c_str(),link->visual->material_name.c_str());
+              #endif
+
               link->visual->material = model->getMaterial( link->visual->material_name.c_str() );
             }
             else
             {
               if (link->visual->material)
               {
+                // 
+                #ifdef VERBOSE_PARSER
                 logDebug("urdfdom: link '%s' material '%s' defined in Visual.", link->name.c_str(),link->visual->material_name.c_str());
+              #endif
+
                 model->materials_.insert(make_pair(link->visual->material->name,link->visual->material));
               }
               else
@@ -157,7 +172,11 @@ my_shared_ptr<ModelInterface>  parseURDF(const std::string &xml_string)
         }
 
         model->links_.insert(make_pair(link->name,link));
-        logDebug("urdfdom: successfully added a new link '%s'", link->name.c_str());
+        // 
+        #ifdef VERBOSE_PARSER
+          logDebug("urdfdom: successfully added a new link '%s'", link->name.c_str());
+        #endif
+
       }
     }
     catch (ParseError &e) {
@@ -190,7 +209,11 @@ my_shared_ptr<ModelInterface>  parseURDF(const std::string &xml_string)
       else
       {
         model->joints_.insert(make_pair(joint->name,joint));
-        logDebug("urdfdom: successfully added a new joint '%s'", joint->name.c_str());
+        // 
+        #ifdef VERBOSE_PARSER
+          logDebug("urdfdom: successfully added a new joint '%s'", joint->name.c_str());
+        #endif
+
       }
     }
     else

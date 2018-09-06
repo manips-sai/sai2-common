@@ -126,7 +126,7 @@ my_shared_ptr<World> parseURDFWorld(const std::string &xml_string)
 		// ensure no duplication of robot names
 		assert(!world->getRobot(robot->name));
 		world->models_.insert(make_pair(robot->name, robot));
-		logDebug("urdfdom: successfully parsed a new robot in the world '%s'", robot->name.c_str());
+		// logDebug("urdfdom: successfully parsed a new robot in the world '%s'", robot->name.c_str());
 	}
 
 	// get all static mesh elements
@@ -137,7 +137,10 @@ my_shared_ptr<World> parseURDFWorld(const std::string &xml_string)
 		// ensure no duplication of object names
 		assert(!world->graphics_.getStaticObject(object->name));
 		world->graphics_.static_objects.insert(make_pair(object->name, object));
+		
+		#ifdef VERBOSE_PARSER
 		logDebug("urdfdom: successfully parsed a new static object in the world '%s'", object->name.c_str());
+		#endif
 	}
 
 	// get all graphics elements: lights
@@ -148,7 +151,10 @@ my_shared_ptr<World> parseURDFWorld(const std::string &xml_string)
 		// ensure no duplication of light names
 		assert(!world->graphics_.getLight(light->name));
 		world->graphics_.lights.insert(make_pair(light->name, light));
+		
+		#ifdef VERBOSE_PARSER
 		logDebug("urdfdom: successfully parsed a new light in the world '%s'", light->name.c_str());
+		#endif
 	}
 
 	// get all graphics elements: cameras
@@ -159,7 +165,10 @@ my_shared_ptr<World> parseURDFWorld(const std::string &xml_string)
 		// ensure no duplication of camera names
 		assert(!world->graphics_.getCamera(camera->name));
 		world->graphics_.cameras.insert(make_pair(camera->name, camera));
+		
+		#ifdef VERBOSE_PARSER
 		logDebug("urdfdom: successfully parsed a new camera in the world '%s'", camera->name.c_str());
+		#endif
 	}
 
 	return world;

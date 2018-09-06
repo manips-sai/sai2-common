@@ -8,7 +8,11 @@ SET(CMAKE_CXX_FLAGS "-std=c++11 -I/usr/include -I/usr/local/include")
 # use KUKA proprietary dynamics library to compute the model class KukaRBDLModel. Default is OFF
 option(USE_KUKA_LBR_DYNAMICS "USE_KUKA_LBR_DYNAMICS" OFF)
 option(USE_SHARED_LIBRARY "USE_SHARED_LIBRARY" OFF)
+option(VERBOSE_PARSER "VERBOSE_PARSER" ON)
 
+if (VERBOSE_PARSER)
+	add_definitions(-DVERBOSE_PARSER)
+endif(VERBOSE_PARSER)
 
 if (USE_SHARED_LIBRARY)
 	set(CMAKE_POSITION_INDEPENDENT_CODE ON)
