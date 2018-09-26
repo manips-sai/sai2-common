@@ -3,11 +3,12 @@
 #ifndef FORCE_SENSOR_SIM_H
 #define FORCE_SENSOR_SIM_H
 
-#include "model/ModelInterface.h"
-#include "simulation/Sai2Simulation.h"
+#include <Sai2Model.h>
+#include <Sai2Simulation.h>
 #include <Eigen/Dense>
 #include <string>
 #include <vector>
+#include "filters/ButterworthFilter.h"
 
 // Basic data structure for force sensor data
 struct ForceSensorData {
@@ -40,7 +41,6 @@ public:
 // Note also that this assumes the force sensor to be located just between the
 // link and the end-effector. That is, it cannot account for any joint reaction
 // forces in case the sensor is to be attached on the link between two joints.
-// Finally note that the sensor returns values in the global frame
 class ForceSensorSim {
 public:
 	// ctor
@@ -48,67 +48,40 @@ public:
 		const std::string& robot_name,
 		const std::string& link_name,
 		const Eigen::Affine3d& transform_in_link,
-		Model::ModelInterface* model)
-	:	_model(model)
-	{
-		_data = new ForceSensorData();
-		_data->_robot_name = robot_name;
-		_data->_link_name = link_name;
-		_data->_transform_in_link = transform_in_link;
-	}
+		Sai2Model::Sai2Model* model);
 
 	//dtor
-	~ForceSensorSim() {
-	}
+	~ForceSensorSim();
 
 	// update force information
-	void update(Simulation::Sai2Simulation* sim) {
-		// NOTE that this assumes that the robot model is updated
-		// get the list of contact forces acting on the link
-		std::vector<Eigen::Vector3d> force_list;
-		std::vector<Eigen::Vector3d> point_list;
-		sim->getContactList(
-			point_list,
-			force_list,
-			_data->_robot_name,
-			_data->_link_name);
-		// zero out current forces and moments
-		_data->_force.setZero();
-		_data->_moment.setZero();
-		// if list is empty, simply set forces and moments to 0
-		if(point_list.empty()) {
-			return;
-		}
-		// transform to sensor frame
-		Eigen::Vector3d rel_pos;
-		Eigen::Vector3d link_pos;
-		_model->position(link_pos, _data->_link_name, _data->_transform_in_link.translation());
-		for (uint pt_ind=0; pt_ind < point_list.size(); ++pt_ind) {
-			_data->_force += force_list[pt_ind];
-			rel_pos = point_list[pt_ind] - link_pos;
-			//unfortunately, it is defined in global frame
-			_data->_moment += rel_pos.cross(force_list[pt_ind]);
-		}
-		_data->_force = _data->_transform_in_link.inverse().rotation()*_data->_force;
-		_data->_moment = _data->_transform_in_link.inverse().rotation()*_data->_moment;
-	}
+	void update(Simulation::Sai2Simulation* sim);
 
-	// get force
-	void getForce(Eigen::Vector3d& ret_force) {
-		ret_force = _data->_force;
-	}
+	// get force applied to sensor body in world coordinates
+	void getForce(Eigen::Vector3d& ret_force);
 
-	// get moment
-	void getMoment(Eigen::Vector3d& ret_moment) {
-		ret_moment = _data->_moment;
-	}
+	// get force applied to sensor body in local sensor frame
+	void getForceLocalFrame(Eigen::Vector3d& ret_force);
+
+	// get moment applied to sensor body in world coordinates
+	void getMoment(Eigen::Vector3d& ret_moment);
+
+	// get moment applied to sensor body in local sensor frame
+	void getMomentLocalFrame(Eigen::Vector3d& ret_moment);
+
+	void enableFilter(const double fc);
 
 public:
 	// handle to model interface
-	Model::ModelInterface* _model;
+	Sai2Model::Sai2Model* _model;
 
 	// last updated data
 	ForceSensorData* _data;
+
+	// filter
+	ButterworthFilter* _force_filter;
+	ButterworthFilter* _moment_filter;
+	bool _filter_on;
+
 };
 
 #endif //FORCE_SENSOR_SIM_H

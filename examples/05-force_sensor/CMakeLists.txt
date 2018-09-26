@@ -7,7 +7,7 @@ INCLUDE_DIRECTORIES (
 	${SAI2-COMMON_INCLUDE_DIRS})
 
 # create an executable
-ADD_EXECUTABLE (05-force_sensor 05-force_sensor.cpp)
+ADD_EXECUTABLE (05-force_sensor 05-force_sensor.cpp ${FORCE_SENSOR_SOURCE})
 
 # and link the library against the executable
 FIND_LIBRARY(GLFW_LIB glfw)
