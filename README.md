@@ -25,7 +25,7 @@ The Sai2-Common library implements a set of helper modules to create robot contr
 
 ### Installation instructions:
 
-## First compile ReflexxesTypeII for your system
+#### First compile ReflexxesTypeII for your system
 -- Linux 64 bits
 ```
 cd external/ReflexxesTypeII/Linux
@@ -40,7 +40,7 @@ make all64
 cd ../../..
 ```
 
-## Then compile the library
+#### Then compile the library
 -- OSX/ Linux:
 
 ```
