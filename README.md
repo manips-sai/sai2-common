@@ -2,44 +2,60 @@
 Note: This project uses Semantic Versioning (http://semver.org/).
 
 ### Project description:
-The Sai2-Common library implements a set of simplifying interfaces and helper modules to create robot control applications. This includes the following modules:
+The Sai2-Common library implements a set of helper modules to create robot control applications. This includes the following modules:
 
-* __parser__ module: to load a robot and world state specification from xml
-* __model__ module: creating articulated rigid body models to represent the robots, 
-* __simulation__ module: creating a virtual world with simulated physics, and
-* __graphics__ module: rendering the world graphically
+* __filters__ module: to implement Butterworth filters on Eigen objects
+* __force_sensor__ module: implement force sensor and display forces as lines when using sai2-simulation and sai2-graphics
+* __redis__ module: wrapper around hiredis for Eigen objects
+* __timer__ module: to easily implement timer for control loops
+* __trajectory_generation__ module : a wrapper around the Reflexxes library typeII for eigen objects
 
 ### 3rdParty dependencies (* = installation required):
 
 * Redis*: Redis server [brew, apt-get]
 * Hiredis*: Redis minimalist client [brew, apt-get]
-* JsonCpp*: JSON serialization [brew, apt-get]
-* Eigen3*: Linear algebra [brew, apt-get]
-* TinyXML2*: XML parser [brew, apt-get]
-* GLFW3*: Window management [brew, apt-get]
-* Chai3d: Graphics and haptics [https://github.com/chai3d/chai3d]
-* RBDL: Articulated rigid-body kinematics, forward dynamics and inverse dynamics. [https://bitbucket.org/rbdl/rbdl/src]  
-Note: Please specify the following CMake flags when building RBDL to build the URDF reader addon: 
-``` cmake
-cmake -DRBDL_BUILD_ADDON_URDFREADER=ON -DRBDL_USE_ROS_URDF_LIBRARY=OFF ..
-```
+* ReflexxesTypeII* : Online trajectory generation. [ http://www.reflexxes.ws/index.html ]
+* Chai3d: Graphics and haptics library [custom forked repository at https://github.com/manips-sai-org/chai3d ]
 
 ### SAI library dependencies:
+* Sai2-UrdfReader: xml and urdf parser [ https://github.com/manips-sai-org/sai2-urdfreader ]
+* Sai2-Model: Robot kinematics and Dynamics library based on RBDL [ https://github.com/manips-sai-org/sai2-model ]
+* Sai2-Graphics: Graphics interface built around chai3d [ https://github.com/manips-sai-org/sai2-graphics ]
 * Sai2-Simulation: Articulated rigid-body physics simulation [private at https://github.com/manips-sai/sai2-simulation, contact shameekg@stanford.edu]
 
-
 ### Installation instructions:
+
+## First compile ReflexxesTypeII for your system
+-- Linux 64 bits
+```
+cd external/ReflexxesTypeII/Linux
+make all64
+cd ../../..
+```
+
+-- Mac 64 bits
+```
+cd external/ReflexxesTypeII/MacOS
+make all64
+cd ../../..
+```
+
+## Then compile the library
 -- OSX/ Linux:
 
-1. mkdir build
-2. cmake ..
-3. make
+```
+mkdir build
+cd build
+cmake ..
+make -j4
+```
 
 ### Uninstallation instructions: 
 -- OSX/ Linux:
-
-1. rm -r build
-2. rm -r ~/.cmake/packages/SAI2-COMMON
+```
+rm -r build
+rm -r ~/.cmake/packages/SAI2-COMMON
+```
 
 ### Getting started:
 Take a look at sample applications under examples/.

@@ -49,6 +49,16 @@ elseif (CMAKE_SYSTEM_NAME MATCHES Linux)
 	set(JSONCPP_LIBRARY ${JSONCPP_LIBRARIES})
 endif ()
 
+# find OTG library 
+# TODO : support debug library
+SET (OTG_SOURCE_DIR ${PROJECT_SOURCE_DIR}/external/ReflexxesTypeII)
+SET (OTG_INCLUDE_DIRS ${OTG_SOURCE_DIR}/include)
+if (CMAKE_SYSTEM_NAME MATCHES Darwin) 
+	#TODO : put the correct path for mac
+	set(OTG_LIBRARY ReflexxesTypeII ${OTG_SOURCE_DIR}/MacOS/x64/release/lib/shared/libReflexxesTypeII.so)
+elseif (CMAKE_SYSTEM_NAME MATCHES Linux)
+	set(OTG_LIBRARY ReflexxesTypeII ${OTG_SOURCE_DIR}/Linux/x64/release/lib/shared/libReflexxesTypeII.so)
+endif () 
 
 SET (SAI2-COMMON_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/src)
 
@@ -65,6 +75,9 @@ SET(TIMER_SOURCE ${PROJECT_SOURCE_DIR}/src/timer/LoopTimer.cpp)
 # include filter
 SET(FILTER_SOURCE ${PROJECT_SOURCE_DIR}/src/filters/ButterworthFilter.cpp)
 
+# include trajectory generation
+SET(OTG_SOURCE ${PROJECT_SOURCE_DIR}/src/trajectory_generation/OTG.cpp)
+
 # Add the include directory to the include paths
 INCLUDE_DIRECTORIES (
 	${PROJECT_SOURCE_DIR}/src
@@ -75,6 +88,7 @@ INCLUDE_DIRECTORIES (
 	${SAI2-MODEL_INCLUDE_DIRS}
 	${SAI2-GRAPHICS_INCLUDE_DIRS}
 	${JSONCPP_INCLUDE_DIRS}
+	${OTG_INCLUDE_DIRS}
 	)
 
 # Create the library. 
@@ -83,6 +97,7 @@ ADD_LIBRARY (sai2-common STATIC
 	${REDIS_SOURCE}
 	${TIMER_SOURCE}
 	${FILTER_SOURCE}
+	${OTG_SOURCE}
 	)
 
 SET (SAI2-COMMON_LIBRARIES sai2-common 
@@ -92,6 +107,7 @@ SET (SAI2-COMMON_LIBRARIES sai2-common
 	${SAI2-MODEL_LIBRARIES}
 	${SAI2-GRAPHICS_LIBRARIES}
 	${JSONCPP_LIBRARY}
+	${OTG_LIBRARY}
 	)
 
 # 
@@ -103,7 +119,7 @@ EXPORT (TARGETS sai2-common FILE ${PROJECT_BINARY_DIR}/SAI2-COMMONTargets.cmake)
 EXPORT (PACKAGE SAI2-COMMON)
 
 # configure package
-SET (CONF_INCLUDE_DIRS ${SAI2-COMMON_INCLUDE_DIRS} ${JSONCPP_INCLUDE_DIRS})
+SET (CONF_INCLUDE_DIRS ${SAI2-COMMON_INCLUDE_DIRS} ${JSONCPP_INCLUDE_DIRS} ${OTG_INCLUDE_DIRS})
 SET (CONF_LIBRARIES ${SAI2-COMMON_LIBRARIES})
 
 # create package configuration and version files
