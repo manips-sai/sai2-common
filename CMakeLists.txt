@@ -4,14 +4,16 @@ PROJECT (SAI2-COMMON)
 SET (PROJECT_VERSION 0.1.0) #major version is zero for now since api will certainly change in future
 
 SET(CMAKE_CXX_FLAGS "-std=c++11 -I/usr/include -I/usr/local/include")
+SET(CMAKE_BUILD_TYPE "Debug")
 
-# set default build to release with debug info. mimic'ed from RBDL project.
-IF(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
-	MESSAGE(STATUS "Setting build type to 'RelWithDebInfo' as none was specified.")
-	# Set the default build, and also the possible values of build type for cmake-gui
-	SET(CMAKE_BUILD_TYPE RelWithDebInfo CACHE STRING "Choose the type of build." FORCE)
-	SET_PROPERTY(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
-ENDIF()
+# # set default build to release with debug info. mimic'ed from RBDL project.
+# IF(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+# 	MESSAGE(STATUS "Setting build type to 'RelWithDebInfo' as none was specified.")
+# 	# Set the default build, and also the possible values of build type for cmake-gui
+# 	SET(CMAKE_BUILD_TYPE RelWithDebInfo CACHE STRING "Choose the type of build." FORCE)
+# 	SET_PROPERTY(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
+# ENDIF()
+
 
 # include Chai3d 
 # -- this is required by Chai3d to pick the correct path for OpenGL headers
@@ -49,17 +51,6 @@ elseif (CMAKE_SYSTEM_NAME MATCHES Linux)
 	set(JSONCPP_LIBRARY ${JSONCPP_LIBRARIES})
 endif ()
 
-# find OTG library 
-# TODO : support debug library
-SET (OTG_SOURCE_DIR ${PROJECT_SOURCE_DIR}/external/ReflexxesTypeII)
-SET (OTG_INCLUDE_DIRS ${OTG_SOURCE_DIR}/include)
-if (CMAKE_SYSTEM_NAME MATCHES Darwin) 
-	#TODO : put the correct path for mac
-	set(OTG_LIBRARY ReflexxesTypeII ${OTG_SOURCE_DIR}/MacOS/x64/release/lib/shared/libReflexxesTypeII.so)
-elseif (CMAKE_SYSTEM_NAME MATCHES Linux)
-	set(OTG_LIBRARY ReflexxesTypeII ${OTG_SOURCE_DIR}/Linux/x64/release/lib/shared/libReflexxesTypeII.so)
-endif () 
-
 SET (SAI2-COMMON_INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/src)
 
 # include Force Sensor
@@ -75,9 +66,6 @@ SET(TIMER_SOURCE ${PROJECT_SOURCE_DIR}/src/timer/LoopTimer.cpp)
 # include filter
 SET(FILTER_SOURCE ${PROJECT_SOURCE_DIR}/src/filters/ButterworthFilter.cpp)
 
-# include trajectory generation
-SET(OTG_SOURCE ${PROJECT_SOURCE_DIR}/src/trajectory_generation/OTG.cpp)
-
 # Add the include directory to the include paths
 INCLUDE_DIRECTORIES (
 	${PROJECT_SOURCE_DIR}/src
@@ -88,7 +76,6 @@ INCLUDE_DIRECTORIES (
 	${SAI2-MODEL_INCLUDE_DIRS}
 	${SAI2-GRAPHICS_INCLUDE_DIRS}
 	${JSONCPP_INCLUDE_DIRS}
-	${OTG_INCLUDE_DIRS}
 	)
 
 # Create the library. 
@@ -97,7 +84,6 @@ ADD_LIBRARY (sai2-common STATIC
 	${REDIS_SOURCE}
 	${TIMER_SOURCE}
 	${FILTER_SOURCE}
-	${OTG_SOURCE}
 	)
 
 SET (SAI2-COMMON_LIBRARIES sai2-common 
@@ -107,7 +93,6 @@ SET (SAI2-COMMON_LIBRARIES sai2-common
 	${SAI2-MODEL_LIBRARIES}
 	${SAI2-GRAPHICS_LIBRARIES}
 	${JSONCPP_LIBRARY}
-	${OTG_LIBRARY}
 	)
 
 # 

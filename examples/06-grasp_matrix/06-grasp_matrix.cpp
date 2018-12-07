@@ -40,7 +40,9 @@ int main() {
 	graphics->getCameraPose(camera_name, camera_pos, camera_vertical, camera_lookat);
 
 	// load robot
-	auto linkage = new Sai2Model::Sai2Model(robot_file, false);
+	Eigen::Affine3d T_world_robot = Eigen::Affine3d::Identity();
+	T_world_robot.translation() = Eigen::Vector3d(0.0,0.0,1.011496);
+	auto linkage = new Sai2Model::Sai2Model(robot_file, false, T_world_robot);
 
 	// Make perfect tetrahedron
 	linkage->_q << 54.7356 /180.0*M_PI, 54.7356 /180.0*M_PI, 54.7356 /180.0*M_PI;
