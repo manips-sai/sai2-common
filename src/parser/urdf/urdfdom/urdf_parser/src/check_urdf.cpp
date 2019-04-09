@@ -38,7 +38,7 @@
 #include <iostream>
 #include <fstream>
 
-using namespace urdf;
+// using namespace sai_urdf;
 
 void printTree(my_shared_ptr<const Link> link,int level = 0)
 {
@@ -51,7 +51,7 @@ void printTree(my_shared_ptr<const Link> link,int level = 0)
       for(int j=0;j<level;j++) std::cout << "  "; //indent
       std::cout << "child(" << (count++)+1 << "):  " << (*child)->name  << std::endl;
       // first grandchild
-      printTree(*child,level);
+      sai_urdf::printTree(*child,level);
     }
     else
     {
@@ -114,7 +114,7 @@ int main(int argc, char** argv)
       xml_file.close();
   }
     
-  my_shared_ptr<ModelInterface> robot = parseURDF(xml_string);
+  my_shared_ptr<ModelInterface> robot = sai_urdf::parseURDF(xml_string);
   if (!robot){
     std::cerr << "ERROR: Model Parsing the xml failed" << std::endl;
     return -1;
@@ -131,7 +131,7 @@ int main(int argc, char** argv)
 
 
   // print entire tree
-  printTree(root_link);
+  sai_urdf::printTree(root_link);
   return 0;
 }
 

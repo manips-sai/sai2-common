@@ -43,7 +43,7 @@
 #include <math.h>
 #include <urdf/urdfdom_headers/urdf_model/include/urdf_model/pose.h>
 
-namespace urdf{
+namespace sai_urdf{
 
 
 class Twist

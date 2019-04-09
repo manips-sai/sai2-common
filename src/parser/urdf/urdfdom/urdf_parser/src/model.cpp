@@ -42,7 +42,7 @@
 	#include "urdf/boost_replacement/printf_console.h"
 #endif
 
-namespace urdf{
+namespace sai_urdf{
 
 bool parseMaterial(Material &material, tinyxml2::XMLElement *config, bool only_name_is_ok);
 bool parseLink(Link &link, tinyxml2::XMLElement *config);
@@ -129,21 +129,21 @@ my_shared_ptr<ModelInterface>  parseURDF(const std::string &xml_string)
       else
       {
         // set link visual material
-        logDebug("urdfdom: setting link '%s' material", link->name.c_str());
+        logDebug("TESTING urdfdom: setting link '%s' material", link->name.c_str());
         if (link->visual)
         {
           if (!link->visual->material_name.empty())
           {
             if (model->getMaterial(link->visual->material_name))
             {
-              logDebug("urdfdom: setting link '%s' material to '%s'", link->name.c_str(),link->visual->material_name.c_str());
+              logDebug("TESTING urdfdom: setting link '%s' material to '%s'", link->name.c_str(),link->visual->material_name.c_str());
               link->visual->material = model->getMaterial( link->visual->material_name.c_str() );
             }
             else
             {
               if (link->visual->material)
               {
-                logDebug("urdfdom: link '%s' material '%s' defined in Visual.", link->name.c_str(),link->visual->material_name.c_str());
+                logDebug("TESTING  urdfdom: link '%s' material '%s' defined in Visual.", link->name.c_str(),link->visual->material_name.c_str());
                 model->materials_.insert(make_pair(link->visual->material->name,link->visual->material));
               }
               else

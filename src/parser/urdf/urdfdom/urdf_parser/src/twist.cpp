@@ -43,7 +43,7 @@
 #include <tinyxml2.h>
 #include <console_bridge/console.h>
 
-namespace urdf{
+namespace sai_urdf{
 
 bool parseTwist(Twist &twist, TiXmlElement* xml)
 {

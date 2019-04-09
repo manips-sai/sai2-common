@@ -55,7 +55,7 @@
 
 
 
-namespace urdf {
+namespace sai_urdf {
 	//TODO: add documentation
   	my_shared_ptr<ModelInterface> parseURDF(const std::string &xml_string);
   	my_shared_ptr<World> parseURDFWorld(const std::string &xml_string);

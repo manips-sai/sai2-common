@@ -53,7 +53,7 @@
 #include "color.h"
 #include "pose.h"
 
-namespace urdf{
+namespace sai_urdf{
 
 class Geometry
 {

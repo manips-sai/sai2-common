@@ -70,7 +70,7 @@
 #include "urdf_model/joint.h"
 #include "urdf_model/link.h"
 
-namespace urdf{
+namespace sai_urdf{
 
 class VisualSensor
 {

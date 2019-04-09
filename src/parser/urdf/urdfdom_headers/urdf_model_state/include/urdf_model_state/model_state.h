@@ -47,7 +47,7 @@
 #include <urdf_model/twist.h>
 
 
-namespace urdf{
+namespace sai_urdf{
 
 class Time
 {

@@ -42,7 +42,7 @@
 #include <tinyxml2.h>
 #include "urdf/boost_replacement/printf_console.h"
 
-namespace urdf{
+namespace sai_urdf{
 
 // function to parse pose. defined in pose.cpp
 bool parsePose(Pose &pose, tinyxml2::XMLElement* xml);

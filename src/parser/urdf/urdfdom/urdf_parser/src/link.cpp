@@ -55,7 +55,7 @@
 
 
 
-namespace urdf{
+namespace sai_urdf{
 
 bool parsePose(Pose &pose, tinyxml2::XMLElement* xml);
 
