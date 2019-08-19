@@ -39,6 +39,9 @@ FIND_PACKAGE(SAI2-GRAPHICS REQUIRED)
 # include Eigen
 FIND_PACKAGE(Eigen3 REQUIRED)
 
+# include tinyxml2
+FIND_LIBRARY(TINYXML_LIBRARIES tinyxml2)
+
 # jsoncpp
 if (CMAKE_SYSTEM_NAME MATCHES Darwin) 
 	find_library(JSONCPP_LIBRARY jsoncpp)
