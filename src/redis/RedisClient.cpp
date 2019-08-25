@@ -176,6 +176,175 @@ void RedisClient::mset(const std::vector<std::pair<std::string, std::string>>& k
 		throw std::runtime_error("RedisClient: MSET command failed.");
 }
 
+
+void RedisClient::addDoubleToRead(const std::string& key, double &object)
+{
+	_keys_to_read.push_back(key);
+	_objects_to_read.push_back(&object);
+	_objects_to_read_types.push_back(DOUBLE_NUMBER);
+}
+
+void RedisClient::addStringToRead(const std::string& key, std::string &object)
+{
+	_keys_to_read.push_back(key);
+	_objects_to_read.push_back(&object);
+	_objects_to_read_types.push_back(STRING);
+}
+
+void RedisClient::addIntToRead(const std::string& key, int &object)
+{
+	_keys_to_read.push_back(key);
+	_objects_to_read.push_back(&object);
+	_objects_to_read_types.push_back(INT_NUMBER);
+}
+
+
+
+void RedisClient::addDoubleToWrite(const std::string& key, double &object)
+{
+	_keys_to_write.push_back(key);
+	_objects_to_write.push_back(&object);
+	_objects_to_write_types.push_back(DOUBLE_NUMBER);
+	_objects_to_write_sizes.push_back(std::make_pair(0,0));
+}
+
+void RedisClient::addStringToWrite(const std::string& key, std::string &object)
+{
+	_keys_to_write.push_back(key);
+	_objects_to_write.push_back(&object);
+	_objects_to_write_types.push_back(STRING);
+	_objects_to_write_sizes.push_back(std::make_pair(0,0));
+}
+
+void RedisClient::addIntToWrite(const std::string& key, int &object)
+{
+	_keys_to_write.push_back(key);
+	_objects_to_write.push_back(&object);
+	_objects_to_write_types.push_back(INT_NUMBER);
+	_objects_to_write_sizes.push_back(std::make_pair(0,0));
+}
+
+
+
+void RedisClient::readAllSetupValues()
+{
+	std::vector<std::string> return_values = pipeget(_keys_to_read);
+
+	for(int i=0 ; i<return_values.size() ; i++)
+	{
+		switch(_objects_to_read_types[i])
+		{
+			case DOUBLE_NUMBER :
+			{
+				double* tmp_pointer = (double*) _objects_to_read.at(i);
+				*tmp_pointer = stod(return_values[i]);
+			}
+			break;
+
+			case INT_NUMBER :
+			{
+				int* tmp_pointer = (int*) _objects_to_read.at(i);
+				*tmp_pointer = stoi(return_values[i]);				
+			}
+			break;
+
+			case STRING :
+			{
+				std::string* tmp_pointer = (std::string*) _objects_to_read.at(i);
+				*tmp_pointer = return_values[i];
+			}
+			break;
+
+			case EIGEN_OBJECT :
+			{
+				double* tmp_pointer = (double*) _objects_to_read.at(i);
+
+				Eigen::MatrixXd tmp_return_matrix = RedisClient::decodeEigenMatrixJSON(return_values[i]);
+
+				int nrows = tmp_return_matrix.rows();
+				int ncols = tmp_return_matrix.cols();
+
+				for(int k=0 ; k<nrows ; k++)
+				{
+					for(int l=0 ; l<ncols ; l++)
+					{
+						tmp_pointer[k + ncols*l] = tmp_return_matrix(k,l);
+					}
+				}
+			}
+			break;
+
+			default :
+			break;
+		}
+	}
+}
+
+void RedisClient::writeAllSetupValues()
+{
+	std::vector<std::pair<std::string,std::string>> write_key_value_pairs;
+
+	for(int i=0 ; i<_keys_to_write.size() ; i++)
+	{
+		std::string encoded_value = "";
+
+		switch(_objects_to_write_types[i])
+		{
+			case DOUBLE_NUMBER:
+			{
+				double* tmp_pointer = (double*) _objects_to_write.at(i);
+				encoded_value = std::to_string(*tmp_pointer);
+			}
+			break;
+
+			case INT_NUMBER:
+			{
+				int* tmp_pointer = (int*) _objects_to_write.at(i);
+				encoded_value = std::to_string(*tmp_pointer);
+			}
+			break;
+
+			case STRING:
+			{
+				std::string* tmp_pointer = (std::string*) _objects_to_write.at(i);
+				encoded_value = (*tmp_pointer);
+			}
+			break;
+
+			case EIGEN_OBJECT:
+			{
+				double* tmp_pointer = (double*) _objects_to_write.at(i);
+				int nrows = _objects_to_write_sizes.at(i).first;
+				int ncols = _objects_to_write_sizes.at(i).second;
+
+				Eigen::MatrixXd tmp_matrix = Eigen::MatrixXd::Zero(nrows, ncols);
+				for(int k=0 ; k<nrows ; k++)
+				{
+					for(int l=0 ; l<ncols ; l++)
+					{
+						tmp_matrix(k,l) = tmp_pointer[k + ncols*l];
+					}
+				}
+
+				encoded_value = encodeEigenMatrixJSON(tmp_matrix);
+			}
+			break;
+		}
+
+		if(encoded_value != "")
+		{
+				write_key_value_pairs.push_back(make_pair(_keys_to_write.at(i),encoded_value));
+		}
+	}
+
+	pipeset(write_key_value_pairs);
+}
+
+
+
+
+
+
 static inline Eigen::MatrixXd decodeEigenMatrixWithDelimiters(const std::string& str,
 	char col_delimiter, char row_delimiter, const std::string& delimiter_set,
 	size_t idx_row_end = std::string::npos)

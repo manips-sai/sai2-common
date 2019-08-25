@@ -47,6 +47,8 @@ struct redisContextDeleter {
 	void operator()(redisContext *c) { redisFree(c); }
 };
 
+
+
 #ifdef KEEP_DEPRECATED
 struct HiredisServerInfo {
 	std::string hostname_;
@@ -56,6 +58,28 @@ struct HiredisServerInfo {
 #endif  // KEEP_DEPRECATED
 
 class RedisClient {
+
+private:
+
+	/**
+	 * private variables for automating pipeget and pipeset
+	 */
+	enum RedisSupportedTypes
+	{
+		INT_NUMBER,
+		DOUBLE_NUMBER,
+		STRING,
+		EIGEN_OBJECT,
+	};
+
+	std::vector<std::string> _keys_to_read;
+	std::vector<void *> _objects_to_read;
+	std::vector<RedisSupportedTypes> _objects_to_read_types;
+
+	std::vector<std::string> _keys_to_write;
+	std::vector<void *> _objects_to_write;
+	std::vector<RedisSupportedTypes> _objects_to_write_types;
+	std::vector<std::pair<int, int>> _objects_to_write_sizes;
 
 public:
 	std::unique_ptr<redisContext, redisContextDeleter> context_;
@@ -170,6 +194,24 @@ public:
 	 * @param keyvals  Vector of key-value pairs to set in Redis.
 	 */
 	void mset(const std::vector<std::pair<std::string, std::string>>& keyvals);
+
+
+
+	void addDoubleToRead(const std::string& key, double &object);
+	void addStringToRead(const std::string& key, std::string &object);
+	void addIntToRead(const std::string& key, int &object);
+
+	template<typename _Scalar, int _Rows, int _Cols, int _Options, int _MaxRows, int _MaxCols>
+	void addEigenToRead(const std::string& key, Eigen::Matrix< _Scalar, _Rows, _Cols, _Options, _MaxRows, _MaxCols >& object);
+
+	void addDoubleToWrite(const std::string& key, double &object);
+	void addStringToWrite(const std::string& key, std::string &object);
+	void addIntToWrite(const std::string& key, int &object);
+	template<typename _Scalar, int _Rows, int _Cols, int _Options, int _MaxRows, int _MaxCols>
+	void addEigenToWrite(const std::string& key, Eigen::Matrix< _Scalar, _Rows, _Cols, _Options, _MaxRows, _MaxCols >& object);
+
+	void readAllSetupValues();
+	void writeAllSetupValues();
 
 	/**
  	 * Encode Eigen::MatrixXd as JSON or space-delimited string.
@@ -445,6 +487,23 @@ std::string RedisClient::encodeEigenMatrixString(const Eigen::MatrixBase<Derived
 		}
 	}
 	return s;
+}
+
+template<typename _Scalar, int _Rows, int _Cols, int _Options, int _MaxRows, int _MaxCols>
+void RedisClient::addEigenToRead(const std::string& key, Eigen::Matrix< _Scalar, _Rows, _Cols, _Options, _MaxRows, _MaxCols >& object)
+{
+	_keys_to_read.push_back(key);
+	_objects_to_read.push_back(object.data());
+	_objects_to_read_types.push_back(EIGEN_OBJECT);
+}
+
+template<typename _Scalar, int _Rows, int _Cols, int _Options, int _MaxRows, int _MaxCols>
+void RedisClient::addEigenToWrite(const std::string& key, Eigen::Matrix< _Scalar, _Rows, _Cols, _Options, _MaxRows, _MaxCols >& object)
+{
+	_keys_to_write.push_back(key);
+	_objects_to_write.push_back(object.data());
+	_objects_to_write_types.push_back(EIGEN_OBJECT);
+	_objects_to_write_sizes.push_back(std::make_pair(object.rows(),object.cols()));
 }
 
 #ifdef KEEP_DEPRECATED
