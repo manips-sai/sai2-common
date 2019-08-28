@@ -119,6 +119,25 @@ void ForceSensorSim::getMomentLocalFrame(Eigen::Vector3d& ret_moment) {
 	ret_moment = R_base_sensor.transpose() * _data->_moment;
 }
 
+// get force and moment
+void ForceSensorSim::getForceMoment(Eigen::VectorXd& ret_force_moment) {
+	ret_force_moment.setZero(6);
+
+	ret_force_moment.head(3) = _data->_force;
+	ret_force_moment.tail(3) = _data->_moment;
+}
+
+void ForceSensorSim::getForceMomentLocalFrame(Eigen::VectorXd& ret_force_moment) {
+	ret_force_moment.setZero(6);
+
+	Eigen::Matrix3d R_base_sensor;
+	_model->rotationInWorld(R_base_sensor, _data->_link_name);
+	R_base_sensor = R_base_sensor * _data->_transform_in_link.rotation();
+
+	ret_force_moment.head(3) = R_base_sensor.transpose() * _data->_force;
+	ret_force_moment.tail(3) = R_base_sensor.transpose() * _data->_moment;
+}
+
 void ForceSensorSim::enableFilter(const double fc)
 {
 	_filter_on = true;

@@ -69,6 +69,12 @@ public:
 	void getMomentLocalFrame(Eigen::Vector3d& ret_moment);
 
 	// Apply Butterworth filter to the force data
+	// get force and moment applied to sensor body in world frame as a 6dof vector (force first moment second)
+	void getForceMoment(Eigen::VectorXd& ret_force_moment);
+
+	// get force and moment applied to sensor body in local sensor frame as a 6dof vector (force first moment second)
+	void getForceMomentLocalFrame(Eigen::VectorXd& ret_force_moment);
+
 	void enableFilter(const double fc);
 
 	// Discretly remove spikes from the force data
