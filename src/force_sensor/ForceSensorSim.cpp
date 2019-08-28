@@ -16,6 +16,11 @@ ForceSensorSim::ForceSensorSim(
 	_force_filter = new ButterworthFilter(3);
 	_moment_filter = new ButterworthFilter(3);
 	_filter_on = false;
+
+	_remove_spike = false;
+	_first_iteration = true;
+
+
 }
 
 //dtor
@@ -54,6 +59,25 @@ void ForceSensorSim::update(Simulation::Sai2Simulation* sim) {
 	Eigen::VectorXd force_raw = _data->_force;
 	Eigen::VectorXd moment_raw = _data->_moment;
 
+	if (_first_iteration)
+	{
+		_previous_force = force_raw;
+		_previous_torque = moment_raw;
+		_first_iteration=false;
+	}
+
+	// Discretly remove spikes if required
+	if (_remove_spike)
+	{
+		std::cout << "F_diff" << fabs(force_raw[0]-_previous_force[0]) << std::endl;
+
+		if(fabs(force_raw[0]-_previous_force[0]) >= _force_threshold)
+		{
+			force_raw = _previous_force;
+			moment_raw = _previous_torque;
+		}
+	}
+
 	if(_filter_on)
 	{
 		_data->_force = _force_filter->update(force_raw);
@@ -64,6 +88,9 @@ void ForceSensorSim::update(Simulation::Sai2Simulation* sim) {
 		_data->_force = force_raw;
 		_data->_moment = moment_raw;
 	}
+
+	_previous_force = _data->_force;
+	_previous_torque = _data->_moment;
 }
 
 // get force
@@ -99,3 +126,8 @@ void ForceSensorSim::enableFilter(const double fc)
 	_moment_filter->setCutoffFrequency(fc);
 }
 
+void ForceSensorSim::removeSpike(const double force_threshold)
+{
+	_remove_spike = true;
+	_force_threshold = force_threshold;
+}

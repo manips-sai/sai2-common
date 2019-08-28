@@ -68,7 +68,11 @@ public:
 	// get moment applied to sensor body in local sensor frame
 	void getMomentLocalFrame(Eigen::Vector3d& ret_moment);
 
+	// Apply Butterworth filter to the force data
 	void enableFilter(const double fc);
+
+	// Discretly remove spikes from the force data
+	void removeSpike(const double force_threshold);
 
 public:
 	// handle to model interface
@@ -81,6 +85,13 @@ public:
 	ButterworthFilter* _force_filter;
 	ButterworthFilter* _moment_filter;
 	bool _filter_on;
+
+	//spike removal
+	bool _remove_spike;
+	bool _first_iteration;
+	double _force_threshold;
+	Eigen::Vector3d _previous_force;
+	Eigen::Vector3d _previous_torque;
 
 };
 
