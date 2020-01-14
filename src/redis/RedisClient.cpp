@@ -10,6 +10,8 @@
 #include <iostream>
 #include <sstream>
 
+using namespace std;
+
 void RedisClient::connect(const std::string& hostname, const int port,
 	                      const struct timeval& timeout) {
 	// Connect to new server
@@ -177,87 +179,258 @@ void RedisClient::mset(const std::vector<std::pair<std::string, std::string>>& k
 }
 
 
-void RedisClient::addDoubleToRead(const std::string& key, double &object)
+void RedisClient::createReadCallback(const int callback_number)
 {
-	_keys_to_read.push_back(key);
-	_objects_to_read.push_back(&object);
-	_objects_to_read_types.push_back(DOUBLE_NUMBER);
+	int n = _read_callback_indexes.size();
+	bool found = false;
+	for(int callback_index=0 ; callback_index < n ; callback_index++)
+	{
+		if(_read_callback_indexes[callback_index] == callback_number)
+		{
+			found = true;
+			break;
+		}
+	}
+	if(found)
+	{
+		cout << "read callback already exists with this index. Not creating a new one" << endl;
+		return;
+	}
+
+	_read_callback_indexes.push_back(callback_number);
+	_keys_to_read.push_back(vector<string>());
+	_objects_to_read.push_back(vector<void *>());
+	_objects_to_read_types.push_back(vector<RedisSupportedTypes>());
 }
 
-void RedisClient::addStringToRead(const std::string& key, std::string &object)
+void RedisClient::createWriteCallback(const int callback_number)
 {
-	_keys_to_read.push_back(key);
-	_objects_to_read.push_back(&object);
-	_objects_to_read_types.push_back(STRING);
-}
+	int n = _write_callback_indexes.size();
+	bool found = false;
+	for(int callback_index=0 ; callback_index < n ; callback_index++)
+	{
+		if(_write_callback_indexes[callback_index] == callback_number)
+		{
+			found = true;
+			break;
+		}
+	}
+	if(found)
+	{
+		cout << "write callback already exists with this index. Not creating a new one" << endl;
+		return;
+	}
 
-void RedisClient::addIntToRead(const std::string& key, int &object)
-{
-	_keys_to_read.push_back(key);
-	_objects_to_read.push_back(&object);
-	_objects_to_read_types.push_back(INT_NUMBER);
-}
-
-
-
-void RedisClient::addDoubleToWrite(const std::string& key, double &object)
-{
-	_keys_to_write.push_back(key);
-	_objects_to_write.push_back(&object);
-	_objects_to_write_types.push_back(DOUBLE_NUMBER);
-	_objects_to_write_sizes.push_back(std::make_pair(0,0));
-}
-
-void RedisClient::addStringToWrite(const std::string& key, std::string &object)
-{
-	_keys_to_write.push_back(key);
-	_objects_to_write.push_back(&object);
-	_objects_to_write_types.push_back(STRING);
-	_objects_to_write_sizes.push_back(std::make_pair(0,0));
-}
-
-void RedisClient::addIntToWrite(const std::string& key, int &object)
-{
-	_keys_to_write.push_back(key);
-	_objects_to_write.push_back(&object);
-	_objects_to_write_types.push_back(INT_NUMBER);
-	_objects_to_write_sizes.push_back(std::make_pair(0,0));
+	_write_callback_indexes.push_back(callback_number);
+	_keys_to_write.push_back(vector<string>());
+	_objects_to_write.push_back(vector<void *>());
+	_objects_to_write_types.push_back(vector<RedisSupportedTypes>());
+	_objects_to_write_sizes.push_back(vector<pair<int, int>>());
 }
 
 
 
-void RedisClient::readAllSetupValues()
+void RedisClient::addDoubleToReadCallback(const int callback_number, const std::string& key, double &object)
 {
-	std::vector<std::string> return_values = pipeget(_keys_to_read);
+	int n = _read_callback_indexes.size();
+	int callback_index = 0;
+	bool found = false;
+	while(callback_index < n)
+	{
+		if(_read_callback_indexes[callback_index] == callback_number)
+		{
+			found = true;
+			break;
+		}
+		callback_index++;
+	}
+	if(!found)
+	{
+		throw runtime_error("no read callback with this index in RedisClient::addDoubleToReadCallback(const int callback_number, const std::string& key, double &object)\n");
+	}
+
+
+	_keys_to_read[callback_index].push_back(key);
+	_objects_to_read[callback_index].push_back(&object);
+	_objects_to_read_types[callback_index].push_back(DOUBLE_NUMBER);
+}
+
+void RedisClient::addStringToReadCallback(const int callback_number, const std::string& key, std::string &object)
+{
+	int n = _read_callback_indexes.size();
+	int callback_index = 0;
+	bool found = false;
+	while(callback_index < n)
+	{
+		if(_read_callback_indexes[callback_index] == callback_number)
+		{
+			found = true;
+			break;
+		}
+		callback_index++;
+	}
+	if(!found)
+	{
+		throw runtime_error("no read callback with this index in RedisClient::addStringToReadCallback(const int callback_number, const std::string& key, std::string &object)\n");
+	}
+
+	_keys_to_read[callback_index].push_back(key);
+	_objects_to_read[callback_index].push_back(&object);
+	_objects_to_read_types[callback_index].push_back(STRING);
+}
+
+void RedisClient::addIntToReadCallback(const int callback_number, const std::string& key, int &object)
+{
+	int n = _read_callback_indexes.size();
+	int callback_index = 0;
+	bool found = false;
+	while(callback_index < n)
+	{
+		if(_read_callback_indexes[callback_index] == callback_number)
+		{
+			found = true;
+			break;
+		}
+		callback_index++;
+	}
+	if(!found)
+	{
+		throw runtime_error("no read callback with this index in RedisClient::addIntToReadCallback(const int callback_number, const std::string& key, int &object)\n");
+	}
+
+	_keys_to_read[callback_index].push_back(key);
+	_objects_to_read[callback_index].push_back(&object);
+	_objects_to_read_types[callback_index].push_back(INT_NUMBER);
+}
+
+
+
+void RedisClient::addDoubleToWriteCallback(const int callback_number, const std::string& key, double &object)
+{
+	int n = _write_callback_indexes.size();
+	int callback_index = 0;
+	bool found = false;
+	while(callback_index < n)
+	{
+		if(_write_callback_indexes[callback_index] == callback_number)
+		{
+			found = true;
+			break;
+		}
+		callback_index++;
+	}
+	if(!found)
+	{
+		throw runtime_error("no write callback with this index in RedisClient::addDoubleToWriteCallback(const int callback_number, const std::string& key, double &object)\n");
+	}
+
+	_keys_to_write[callback_index].push_back(key);
+	_objects_to_write[callback_index].push_back(&object);
+	_objects_to_write_types[callback_index].push_back(DOUBLE_NUMBER);
+	_objects_to_write_sizes[callback_index].push_back(std::make_pair(0,0));
+}
+
+void RedisClient::addStringToWriteCallback(const int callback_number, const std::string& key, std::string &object)
+{
+	int n = _write_callback_indexes.size();
+	int callback_index = 0;
+	bool found = false;
+	while(callback_index < n)
+	{
+		if(_write_callback_indexes[callback_index] == callback_number)
+		{
+			found = true;
+			break;
+		}
+		callback_index++;
+	}
+	if(!found)
+	{
+		throw runtime_error("no write callback with this index in RedisClient::addStringToWriteCallback(const int callback_number, const std::string& key, std::string &object)\n");
+	}
+
+	_keys_to_write[callback_index].push_back(key);
+	_objects_to_write[callback_index].push_back(&object);
+	_objects_to_write_types[callback_index].push_back(STRING);
+	_objects_to_write_sizes[callback_index].push_back(std::make_pair(0,0));
+}
+
+void RedisClient::addIntToWriteCallback(const int callback_number, const std::string& key, int &object)
+{
+	int n = _write_callback_indexes.size();
+	int callback_index = 0;
+	bool found = false;
+	while(callback_index < n)
+	{
+		if(_write_callback_indexes[callback_index] == callback_number)
+		{
+			found = true;
+			break;
+		}
+		callback_index++;
+	}
+	if(!found)
+	{
+		throw runtime_error("no write callback with this index in RedisClient::addIntToWriteCallback(const int callback_number, const std::string& key, int &object)\n");
+	}
+
+	_keys_to_write[callback_index].push_back(key);
+	_objects_to_write[callback_index].push_back(&object);
+	_objects_to_write_types[callback_index].push_back(INT_NUMBER);
+	_objects_to_write_sizes[callback_index].push_back(std::make_pair(0,0));
+}
+
+
+
+void RedisClient::executeReadCallback(const int callback_number)
+{
+	int n = _read_callback_indexes.size();
+	int callback_index = 0;
+	bool found = false;
+	while(callback_index < n)
+	{
+		if(_read_callback_indexes[callback_index] == callback_number)
+		{
+			found = true;
+			break;
+		}
+		callback_index++;
+	}
+	if(!found)
+	{
+		throw runtime_error("no read callback with this index in RedisClient::executeReadCallback(const int callback_number)\n");
+	}
+
+	std::vector<std::string> return_values = pipeget(_keys_to_read[callback_index]);
 
 	for(int i=0 ; i<return_values.size() ; i++)
 	{
-		switch(_objects_to_read_types[i])
+		switch(_objects_to_read_types[callback_index].at(i))
 		{
 			case DOUBLE_NUMBER :
 			{
-				double* tmp_pointer = (double*) _objects_to_read.at(i);
+				double* tmp_pointer = (double*) _objects_to_read[callback_index].at(i);
 				*tmp_pointer = stod(return_values[i]);
 			}
 			break;
 
 			case INT_NUMBER :
 			{
-				int* tmp_pointer = (int*) _objects_to_read.at(i);
+				int* tmp_pointer = (int*) _objects_to_read[callback_index].at(i);
 				*tmp_pointer = stoi(return_values[i]);				
 			}
 			break;
 
 			case STRING :
 			{
-				std::string* tmp_pointer = (std::string*) _objects_to_read.at(i);
+				std::string* tmp_pointer = (std::string*) _objects_to_read[callback_index].at(i);
 				*tmp_pointer = return_values[i];
 			}
 			break;
 
 			case EIGEN_OBJECT :
 			{
-				double* tmp_pointer = (double*) _objects_to_read.at(i);
+				double* tmp_pointer = (double*) _objects_to_read[callback_index].at(i);
 
 				Eigen::MatrixXd tmp_return_matrix = RedisClient::decodeEigenMatrixJSON(return_values[i]);
 
@@ -280,42 +453,60 @@ void RedisClient::readAllSetupValues()
 	}
 }
 
-void RedisClient::writeAllSetupValues()
+void RedisClient::executeWriteCallback(const int callback_number)
 {
+	int n = _write_callback_indexes.size();
+	int callback_index = 0;
+	bool found = false;
+	while(callback_index < n)
+	{
+		if(_write_callback_indexes[callback_index] == callback_number)
+		{
+			found = true;
+			break;
+		}
+		callback_index++;
+	}
+	if(!found)
+	{
+		throw runtime_error("no write callback with this index in RedisClient::executeWriteCallback(const int callback_number)\n");
+	}
+
+
 	std::vector<std::pair<std::string,std::string>> write_key_value_pairs;
 
-	for(int i=0 ; i<_keys_to_write.size() ; i++)
+	for(int i=0 ; i<_keys_to_write[callback_index].size() ; i++)
 	{
 		std::string encoded_value = "";
 
-		switch(_objects_to_write_types[i])
+		switch(_objects_to_write_types[callback_index].at(i))
 		{
 			case DOUBLE_NUMBER:
 			{
-				double* tmp_pointer = (double*) _objects_to_write.at(i);
+				double* tmp_pointer = (double*) _objects_to_write[callback_index].at(i);
 				encoded_value = std::to_string(*tmp_pointer);
 			}
 			break;
 
 			case INT_NUMBER:
 			{
-				int* tmp_pointer = (int*) _objects_to_write.at(i);
+				int* tmp_pointer = (int*) _objects_to_write[callback_index].at(i);
 				encoded_value = std::to_string(*tmp_pointer);
 			}
 			break;
 
 			case STRING:
 			{
-				std::string* tmp_pointer = (std::string*) _objects_to_write.at(i);
+				std::string* tmp_pointer = (std::string*) _objects_to_write[callback_index].at(i);
 				encoded_value = (*tmp_pointer);
 			}
 			break;
 
 			case EIGEN_OBJECT:
 			{
-				double* tmp_pointer = (double*) _objects_to_write.at(i);
-				int nrows = _objects_to_write_sizes.at(i).first;
-				int ncols = _objects_to_write_sizes.at(i).second;
+				double* tmp_pointer = (double*) _objects_to_write[callback_index].at(i);
+				int nrows = _objects_to_write_sizes[callback_index].at(i).first;
+				int ncols = _objects_to_write_sizes[callback_index].at(i).second;
 
 				Eigen::MatrixXd tmp_matrix = Eigen::MatrixXd::Zero(nrows, ncols);
 				for(int k=0 ; k<nrows ; k++)
@@ -333,7 +524,7 @@ void RedisClient::writeAllSetupValues()
 
 		if(encoded_value != "")
 		{
-				write_key_value_pairs.push_back(make_pair(_keys_to_write.at(i),encoded_value));
+				write_key_value_pairs.push_back(make_pair(_keys_to_write[callback_index].at(i),encoded_value));
 		}
 	}
 

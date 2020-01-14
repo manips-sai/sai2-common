@@ -72,14 +72,16 @@ private:
 		EIGEN_OBJECT,
 	};
 
-	std::vector<std::string> _keys_to_read;
-	std::vector<void *> _objects_to_read;
-	std::vector<RedisSupportedTypes> _objects_to_read_types;
+	std::vector<int> _read_callback_indexes;
+	std::vector<std::vector<std::string>> _keys_to_read;
+	std::vector<std::vector<void *>> _objects_to_read;
+	std::vector<std::vector<RedisSupportedTypes>> _objects_to_read_types;
 
-	std::vector<std::string> _keys_to_write;
-	std::vector<void *> _objects_to_write;
-	std::vector<RedisSupportedTypes> _objects_to_write_types;
-	std::vector<std::pair<int, int>> _objects_to_write_sizes;
+	std::vector<int> _write_callback_indexes;
+	std::vector<std::vector<std::string>> _keys_to_write;
+	std::vector<std::vector<void *>> _objects_to_write;
+	std::vector<std::vector<RedisSupportedTypes>> _objects_to_write_types;
+	std::vector<std::vector<std::pair<int, int>>> _objects_to_write_sizes;
 
 public:
 	std::unique_ptr<redisContext, redisContextDeleter> context_;
@@ -196,22 +198,24 @@ public:
 	void mset(const std::vector<std::pair<std::string, std::string>>& keyvals);
 
 
+	void createReadCallback(const int callback_number);
+	void createWriteCallback(const int callback_number);
 
-	void addDoubleToRead(const std::string& key, double &object);
-	void addStringToRead(const std::string& key, std::string &object);
-	void addIntToRead(const std::string& key, int &object);
+	void addDoubleToReadCallback(const int callback_number, const std::string& key, double &object);
+	void addStringToReadCallback(const int callback_number, const std::string& key, std::string &object);
+	void addIntToReadCallback(const int callback_number, const std::string& key, int &object);
 
 	template<typename _Scalar, int _Rows, int _Cols, int _Options, int _MaxRows, int _MaxCols>
-	void addEigenToRead(const std::string& key, Eigen::Matrix< _Scalar, _Rows, _Cols, _Options, _MaxRows, _MaxCols >& object);
+	void addEigenToReadCallback(const int callback_number, const std::string& key, Eigen::Matrix< _Scalar, _Rows, _Cols, _Options, _MaxRows, _MaxCols >& object);
 
-	void addDoubleToWrite(const std::string& key, double &object);
-	void addStringToWrite(const std::string& key, std::string &object);
-	void addIntToWrite(const std::string& key, int &object);
+	void addDoubleToWriteCallback(const int callback_number, const std::string& key, double &object);
+	void addStringToWriteCallback(const int callback_number, const std::string& key, std::string &object);
+	void addIntToWriteCallback(const int callback_number, const std::string& key, int &object);
 	template<typename _Scalar, int _Rows, int _Cols, int _Options, int _MaxRows, int _MaxCols>
-	void addEigenToWrite(const std::string& key, Eigen::Matrix< _Scalar, _Rows, _Cols, _Options, _MaxRows, _MaxCols >& object);
+	void addEigenToWriteCallback(const int callback_number, const std::string& key, Eigen::Matrix< _Scalar, _Rows, _Cols, _Options, _MaxRows, _MaxCols >& object);
 
-	void readAllSetupValues();
-	void writeAllSetupValues();
+	void executeReadCallback(const int callback_number);
+	void executeWriteCallback(const int callback_number);
 
 	/**
  	 * Encode Eigen::MatrixXd as JSON or space-delimited string.
@@ -490,20 +494,54 @@ std::string RedisClient::encodeEigenMatrixString(const Eigen::MatrixBase<Derived
 }
 
 template<typename _Scalar, int _Rows, int _Cols, int _Options, int _MaxRows, int _MaxCols>
-void RedisClient::addEigenToRead(const std::string& key, Eigen::Matrix< _Scalar, _Rows, _Cols, _Options, _MaxRows, _MaxCols >& object)
+void RedisClient::addEigenToReadCallback(const int callback_number, const std::string& key, Eigen::Matrix< _Scalar, _Rows, _Cols, _Options, _MaxRows, _MaxCols >& object)
 {
-	_keys_to_read.push_back(key);
-	_objects_to_read.push_back(object.data());
-	_objects_to_read_types.push_back(EIGEN_OBJECT);
+	int n = _read_callback_indexes.size();
+	int callback_index = 0;
+	bool found = false;
+	while(callback_index < n)
+	{
+		if(_read_callback_indexes[callback_index] == callback_number)
+		{
+			found = true;
+			break;
+		}
+		callback_index++;
+	}
+	if(!found)
+	{
+		throw std::runtime_error("no read callback with this index in RedisClient::addEigenToReadCallback(const int callback_number, const std::string& key, Eigen::Matrix< _Scalar, _Rows, _Cols, _Options, _MaxRows, _MaxCols >& object)\n");
+	}
+
+	_keys_to_read[callback_index].push_back(key);
+	_objects_to_read[callback_index].push_back(object.data());
+	_objects_to_read_types[callback_index].push_back(EIGEN_OBJECT);
 }
 
 template<typename _Scalar, int _Rows, int _Cols, int _Options, int _MaxRows, int _MaxCols>
-void RedisClient::addEigenToWrite(const std::string& key, Eigen::Matrix< _Scalar, _Rows, _Cols, _Options, _MaxRows, _MaxCols >& object)
+void RedisClient::addEigenToWriteCallback(const int callback_number, const std::string& key, Eigen::Matrix< _Scalar, _Rows, _Cols, _Options, _MaxRows, _MaxCols >& object)
 {
-	_keys_to_write.push_back(key);
-	_objects_to_write.push_back(object.data());
-	_objects_to_write_types.push_back(EIGEN_OBJECT);
-	_objects_to_write_sizes.push_back(std::make_pair(object.rows(),object.cols()));
+	int n = _write_callback_indexes.size();
+	int callback_index = 0;
+	bool found = false;
+	while(callback_index < n)
+	{
+		if(_write_callback_indexes[callback_index] == callback_number)
+		{
+			found = true;
+			break;
+		}
+		callback_index++;
+	}
+	if(!found)
+	{
+		throw std::runtime_error("no write callback with this index in RedisClient::addEigenToWriteCallback(const int callback_number, const std::string& key, Eigen::Matrix< _Scalar, _Rows, _Cols, _Options, _MaxRows, _MaxCols >& object)\n");
+	}
+
+	_keys_to_write[callback_index].push_back(key);
+	_objects_to_write[callback_index].push_back(object.data());
+	_objects_to_write_types[callback_index].push_back(EIGEN_OBJECT);
+	_objects_to_write_sizes[callback_index].push_back(std::make_pair(object.rows(),object.cols()));
 }
 
 #ifdef KEEP_DEPRECATED
