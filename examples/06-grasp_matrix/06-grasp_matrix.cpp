@@ -9,6 +9,7 @@
 #include <string>
 
 using namespace std;
+using namespace Eigen;
 
 const string world_file = "resources/world.urdf";
 const string robot_file = "resources/linkage.urdf";
@@ -36,7 +37,7 @@ int main() {
 
 	// load graphics scene
 	auto graphics = new Sai2Graphics::Sai2Graphics(world_file, true);
-	Eigen::Vector3d camera_pos, camera_lookat, camera_vertical;
+	Vector3d camera_pos, camera_lookat, camera_vertical;
 	graphics->getCameraPose(camera_name, camera_pos, camera_vertical, camera_lookat);
 
 	// load robot
@@ -80,9 +81,9 @@ int main() {
 	// cache variables
 	double last_cursorx, last_cursory;
 
-	Eigen::MatrixXd G;
-	Eigen::Matrix3d R;
-	Eigen::Vector3d center_point = Eigen::Vector3d::Zero();
+	MatrixXd G;
+	Matrix3d R;
+	Vector3d center_point = Vector3d::Zero();
 
 	//----------------------------------------
 	// test dual contact case with surface contact at one side and point at the other
@@ -91,16 +92,16 @@ int main() {
 	// link_names.push_back("link0");
 	// link_names.push_back("link1");
 
-	// vector<Eigen::Vector3d> pos_in_links;
-	// pos_in_links.push_back(Eigen::Vector3d(1,0,0));
-	// pos_in_links.push_back(Eigen::Vector3d(1,0,0));
+	// vector<Vector3d> pos_in_links;
+	// pos_in_links.push_back(Vector3d(1,0,0));
+	// pos_in_links.push_back(Vector3d(1,0,0));
 
 	// vector<Sai2Model::ContactNature> contact_natures;
 	// contact_natures.push_back(Sai2Model::SurfaceContact);
 	// contact_natures.push_back(Sai2Model::PointContact);
 
-	linkage->addEnvironmentalContact("link0", Eigen::Vector3d(1,0,0), 2);
-	linkage->addEnvironmentalContact("link1", Eigen::Vector3d(1,0,0), 0);
+	linkage->addEnvironmentalContact("link0", Vector3d(1,0,0), Matrix3d::Identity(), 2);
+	linkage->addEnvironmentalContact("link1", Vector3d(1,0,0), Matrix3d::Identity(), 0);
 	
 	// for 2 contact points. the grasp matrix is given in the local frame of the virtual linkage
 	// More precisely, given the external forces and moments in world frame, we get
@@ -127,16 +128,16 @@ int main() {
 	// link_names.push_back("link2");
 
 	// pos_in_links.clear();
-	// pos_in_links.push_back(Eigen::Vector3d(1,0,0));
-	// pos_in_links.push_back(Eigen::Vector3d(1,0,0));
-	// pos_in_links.push_back(Eigen::Vector3d(1,0,0));
+	// pos_in_links.push_back(Vector3d(1,0,0));
+	// pos_in_links.push_back(Vector3d(1,0,0));
+	// pos_in_links.push_back(Vector3d(1,0,0));
 
 	// contact_natures.clear();
 	// contact_natures.push_back(Sai2Model::SurfaceContact);
 	// contact_natures.push_back(Sai2Model::PointContact);
 	// contact_natures.push_back(Sai2Model::PointContact);
 
-	linkage->addEnvironmentalContact("link2", Eigen::Vector3d(1,0,0));
+	linkage->addEnvironmentalContact("link2", Vector3d(1,0,0), Matrix3d::Identity(), 0);
 
 	// for 3 contact points, everything is given in world frame.
 	// the tensions are in the order 1-2, 1-3, 2-3.
@@ -174,13 +175,13 @@ int main() {
 	
 		// move scene camera as required
     	// graphics->getCameraPose(camera_name, camera_pos, camera_vertical, camera_lookat);
-    	Eigen::Vector3d cam_up_axis;
+    	Vector3d cam_up_axis;
     	// cam_up_axis = camera_vertical;
     	// cam_up_axis.normalize();
     	cam_up_axis << 0.0, 0.0, 1.0; //TODO: there might be a better way to do this
-	    Eigen::Vector3d cam_roll_axis = (camera_lookat - camera_pos).cross(cam_up_axis);
+	    Vector3d cam_roll_axis = (camera_lookat - camera_pos).cross(cam_up_axis);
     	cam_roll_axis.normalize();
-    	Eigen::Vector3d cam_lookat_axis = camera_lookat;
+    	Vector3d cam_lookat_axis = camera_lookat;
     	cam_lookat_axis.normalize();
     	if (fTransXp) {
 	    	camera_pos = camera_pos + 0.05*cam_roll_axis;
@@ -208,9 +209,9 @@ int main() {
 			double compass = 0.006*(cursorx - last_cursorx);
 			double azimuth = 0.006*(cursory - last_cursory);
 			double radius = (camera_pos - camera_lookat).norm();
-			Eigen::Matrix3d m_tilt; m_tilt = Eigen::AngleAxisd(azimuth, -cam_roll_axis);
+			Matrix3d m_tilt; m_tilt = AngleAxisd(azimuth, -cam_roll_axis);
 			camera_pos = camera_lookat + m_tilt*(camera_pos - camera_lookat);
-			Eigen::Matrix3d m_pan; m_pan = Eigen::AngleAxisd(compass, -cam_up_axis);
+			Matrix3d m_pan; m_pan = AngleAxisd(compass, -cam_up_axis);
 			camera_pos = camera_lookat + m_pan*(camera_pos - camera_lookat);
 	    }
 	    graphics->setCameraPose(camera_name, camera_pos, cam_up_axis, camera_lookat);
