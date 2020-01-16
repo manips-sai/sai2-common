@@ -42,7 +42,7 @@ public:
 
 	// set current window and cursor properties
 	// this updates the internal parameters for calculating the ui interaction force
-	void setInteractionParams(const std::string& camera_name,
+	bool setInteractionParams(const std::string& camera_name,
 								int viewx,
 								int viewy,
 								int window_width,

@@ -19,8 +19,8 @@ void UIForceWidget::setEnable(bool enable) {
 
 // set current window and cursor properties
 // this updates the internal parameters for calculating the ui interaction force
-void UIForceWidget::setInteractionParams(const string& camera_name, int viewx, int viewy, int window_width, int window_height) {
-	if (_state == Disabled) {return;}
+bool UIForceWidget::setInteractionParams(const string& camera_name, int viewx, int viewy, int window_width, int window_height) {
+	if (_state == Disabled) {return false;}
 
 	// if state is inactive, check if link selection is in progress
 	if (_state == Inactive) {
@@ -36,16 +36,18 @@ void UIForceWidget::setInteractionParams(const string& camera_name, int viewx, i
 			_state = Active;
 			// std::cout << "Active: link " << _link_name << std::endl;
 		}
+		else
+		{
+			return false;
+		}
 		//TODO: as an optimization we could perform this check only once per click
 	}
 	// if state is active,
 	if (_state == Active) {
 		// update line point A in global graphics frame
 		Eigen::Vector3d pointA_pos_base;
-		_robot->position(pointA_pos_base, _link_name, _link_local_pos);
+		_robot->positionInWorld(pointA_pos_base, _link_name, _link_local_pos);
 		_display_line->m_pointA.set(pointA_pos_base[0], pointA_pos_base[1], pointA_pos_base[2]);
-		// TODO: ^this is most likely wrong! since the model is only referenced with respect to the model file
-		// If the model is located elsewhere in the world, 
 
 		// update line point B. Assumes perspective view!
 		// m_fieldViewAngleDeg / 2.0 would correspond to the _top_ of the window
@@ -68,6 +70,8 @@ void UIForceWidget::setInteractionParams(const string& camera_name, int viewx, i
 		// display line
 		_display_line->setShowEnabled(true);
 	}
+
+	return true;
 }
 
 // get interaction force
@@ -102,7 +106,7 @@ void UIForceWidget::getUIJointTorques(Eigen::VectorXd& ret_torques) const {
 
 	Eigen::Vector3d force;
 	getUIForce(force);
-	// compute Jv'F for the force and set interaction torque to redis
+	// compute Jv'F for the force
 	Eigen::MatrixXd Jv;
 	_robot->Jv(Jv, _link_name, _link_local_pos);
 	ret_torques = Jv.transpose() * force;

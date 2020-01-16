@@ -146,9 +146,10 @@ int main() {
 			int viewx = floor(cursorx / wwidth_scr * wwidth_pix);
 			int viewy = floor(cursory / wheight_scr * wheight_pix);
 
-			ui_force_widget->setInteractionParams(camera_name, viewx, wheight_pix - viewy, wwidth_pix, wheight_pix);
-			//TODO: this behavior might be wrong. this will allow the user to click elsewhere in the screen
-			// then drag the mouse over a link to start applying a force to it.
+			if(!ui_force_widget->setInteractionParams(camera_name, viewx, wheight_pix - viewy, wwidth_pix, wheight_pix))
+			{
+				fRobotLinkSelect = false;
+			}
 		}
 
 	}
@@ -212,7 +213,7 @@ void simulation(Sai2Model::Sai2Model* robot, Simulation::Sai2Simulation* sim, UI
 		sim->integrate(curr_time - last_time);
 
 		// get ui force and torques
-		if(fRobotLinkSelect)
+		if(ui_force_widget->getState() == UIForceWidget::UIForceWidgetState::Active)
 		{
 			ui_force_widget->getUIForce(ui_force);
 			ui_force_widget->getUIJointTorques(ui_force_command_torques);
