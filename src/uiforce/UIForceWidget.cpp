@@ -34,6 +34,7 @@ bool UIForceWidget::setInteractionParams(const string& camera_name, int viewx, i
                                    				_link_local_pos);
 		if (fLinkSelected) {
 			_state = Active;
+			_robot->positionInWorld(_initial_click_point, _link_name, _link_local_pos);
 			// std::cout << "Active: link " << _link_name << std::endl;
 		}
 		else
@@ -59,10 +60,10 @@ bool UIForceWidget::setInteractionParams(const string& camera_name, int viewx, i
                       (viewx - (window_width/2.0)),
                       (viewy - (window_height/2.0));
 
-        // create a point that's at the same axial distance from the camera as the lookat position
+        // create a point that's at the same axial distance from the camera as the initial click point
         Eigen::Vector3d camera_pos, camera_lookat, camera_vertical;
 		_graphics->getCameraPose(camera_name, camera_pos, camera_vertical, camera_lookat);
-        double lookat_dist = (camera_lookat - camera_pos).norm();
+        double lookat_dist = (_initial_click_point - camera_pos).norm();
         selectRay = selectRay * lookat_dist/selectRay.x();
         selectRay = camera->getGlobalRot().eigen() * selectRay;
 		_display_line->m_pointB = camera->getGlobalPos() - cVector3d(selectRay);

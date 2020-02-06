@@ -86,6 +86,9 @@ public:
 
 	// local position at which force is being applied
 	Eigen::Vector3d _link_local_pos;
+
+	// initial poisition of the point that was clicked
+	Eigen::Vector3d _initial_click_point;
 };
 
 #endif //UIFORCE_WIDGET_H
