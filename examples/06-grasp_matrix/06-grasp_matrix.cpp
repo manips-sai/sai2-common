@@ -81,7 +81,7 @@ int main() {
 	// cache variables
 	double last_cursorx, last_cursory;
 
-	MatrixXd G;
+	MatrixXd G, G_inverse;
 	Matrix3d R;
 	Vector3d center_point = Vector3d::Zero();
 
@@ -100,15 +100,15 @@ int main() {
 	// contact_natures.push_back(Sai2Model::SurfaceContact);
 	// contact_natures.push_back(Sai2Model::PointContact);
 
-	linkage->addEnvironmentalContact("link0", Vector3d(1,0,0), Matrix3d::Identity(), 2);
-	linkage->addEnvironmentalContact("link1", Vector3d(1,0,0), Matrix3d::Identity(), 0);
+	linkage->addEnvironmentalContact("link0", Vector3d(1,0,0), Matrix3d::Identity(), Sai2Model::ContactType::SurfaceContact);
+	linkage->addEnvironmentalContact("link1", Vector3d(1,0,0), Matrix3d::Identity(), Sai2Model::ContactType::PointContact);
 	
 	// for 2 contact points. the grasp matrix is given in the local frame of the virtual linkage
 	// More precisely, given the external forces and moments in world frame, we get
 	// the support forces and moments in local frame, as well as the internal moments along the y and z axis in local frame
 	// The local frame is described by the matrix R
 	// linkage->environmentalGraspMatrixAtGeometricCenter(G, R, center_point, link_names, pos_in_links, contact_natures);
-	linkage->environmentalGraspMatrixAtGeometricCenter(G, R, center_point);
+	linkage->environmentalGraspMatrixAtGeometricCenter(G, G_inverse, R, center_point);
 	// G.block<3,9>(0,0) = R*G.block<3,9>(0,0);
 	// G.block<3,9>(3,0) = R*G.block<3,9>(3,0);
 
@@ -117,6 +117,7 @@ int main() {
 	cout << "--------------------------------------------" << endl;
 	cout << "center point : " << center_point.transpose() << endl << endl;
 	cout << "Grasp matrix : \n" << G << endl << "R : \n" << R << endl << endl;
+	cout << "Grasp matrix inverse : \n" << G_inverse << endl << "R : \n" << R << endl << endl;
 	cout << endl << endl;
 
 	//----------------------------------------
@@ -137,11 +138,11 @@ int main() {
 	// contact_natures.push_back(Sai2Model::PointContact);
 	// contact_natures.push_back(Sai2Model::PointContact);
 
-	linkage->addEnvironmentalContact("link2", Vector3d(1,0,0), Matrix3d::Identity(), 0);
+	linkage->addEnvironmentalContact("link2", Vector3d(1,0,0), Matrix3d::Identity(), Sai2Model::ContactType::PointContact);
 
 	// for 3 contact points, everything is given in world frame.
 	// the tensions are in the order 1-2, 1-3, 2-3.
-	linkage->environmentalGraspMatrixAtGeometricCenter(G, R, center_point);
+	linkage->environmentalGraspMatrixAtGeometricCenter(G, G_inverse, R, center_point);
 	
 	cout << "--------------------------------------------" << endl;
 	cout << "                  3 contacts                " << endl;
@@ -149,6 +150,7 @@ int main() {
 
 	cout << "center point : " << center_point.transpose() << endl << endl;
 	cout << "Grasp matrix : \n" << G << endl << "R : \n" << R << endl << endl;
+	cout << "Grasp matrix : \n" << G_inverse << endl << "R : \n" << R << endl << endl;
 
 	// while window is open:
     while (!glfwWindowShouldClose(window))
